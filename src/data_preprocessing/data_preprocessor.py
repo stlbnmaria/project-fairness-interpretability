@@ -188,6 +188,7 @@ def preprocessor(data_path: Path, cols: List[str]) -> pd.DataFrame:
     data, _ = load_data(data_path)
     data = change_to_numeric(data)
     data = feature_engineering(data)
+    data = transform_label(data)
     data = drop_cols(data, cols)
     data = filter_na(data)
 
