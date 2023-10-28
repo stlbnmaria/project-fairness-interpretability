@@ -3,11 +3,28 @@ from pathlib import Path
 from typing import List, Tuple
 
 import pandas as pd
+import yaml
 from fuzzywuzzy import fuzz, process
 from scipy.io.arff import loadarff
 from scipy.io.arff._arffread import MetaData
 
-from config.config_data import DATA_PATH, DROP_COLS, OUT_PATH
+# import sys
+from config.config_data import (  # , DATA_PATH, OUT_PATH
+    DROP_COLS,
+    M_DICT_H_PATH,
+    M_DICT_PATH,
+    N_CATEGORIES,
+)
+
+# sys.path.append("../../")
+# from config.config_data import (  # , DATA_PATH, OUT_PATH
+#     DROP_COLS,
+#     M_DICT_H_PATH,
+#     M_DICT_PATH,
+#     N_CATEGORIES,
+# )
+
+# from config.config_data import DATA_PATH, DROP_COLS, OUT_PATH
 
 
 def load_data(path_: Path) -> Tuple[pd.DataFrame, MetaData]:
@@ -122,7 +139,7 @@ def transform_label(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def convert_float_to_int(df: pd.DataFrame, column_name: str) -> pd.DataFrame:
+def convert_float_to_int(df: pd.DataFrame, column_name: str = "Year") -> pd.DataFrame:
     """If possible to convert float to int converts to int.
 
     Args:
@@ -135,6 +152,21 @@ def convert_float_to_int(df: pd.DataFrame, column_name: str) -> pd.DataFrame:
         print("Can't be converted to int")
 
     return df
+
+
+def read_yaml(path: Path) -> dict:
+    """Reads yaml file from given path and returns as dict.
+
+    Args:
+        path (Path): the path of the respective yaml file
+
+    Returns:
+        dict: the yaml file reconverted to a dict
+    """
+    with open(path, "r") as yaml_file:
+        make_match_dictionary = yaml.load(yaml_file, Loader=yaml.FullLoader)
+
+    return make_match_dictionary
 
 
 def clean_string(s: str) -> str:
@@ -154,7 +186,10 @@ def clean_string(s: str) -> str:
 
 # Function to find the best match
 def replace_with_best_match(
-    df: pd.DataFrame, column_name: str, choices: dict, threshold: int = 50
+    df: pd.DataFrame,
+    choices: dict,
+    threshold: int = 50,
+    column_name: str = "Make",
 ) -> pd.DataFrame:
     """Finds best match between value of the dataframe & of dictionary.
 
@@ -201,7 +236,14 @@ def replace_with_best_match(
     return df
 
 
-def categorize_top_n(df: pd.DataFrame, column_name: str, n: int) -> pd.DataFrame:
+def replace_with_hard(data: pd.DataFrame, dict_hard: dict, column: str = "Make") -> pd.DataFrame:
+    data[column] = data[column].replace(dict_hard)
+    return data
+
+
+def categorize_top_n(
+    df: pd.DataFrame, column_name: str = "Make", n: int = N_CATEGORIES
+) -> pd.DataFrame:
     """Keep top n classes & missing values and set rest of categories as other.
 
     Args:
@@ -294,6 +336,12 @@ def preprocessor(data_path: Path, cols: List[str]) -> pd.DataFrame:
     data = change_to_numeric(data)
     data = feature_engineering(data)
     data = transform_label(data)
+    data = convert_float_to_int(data)
+    make_dict = read_yaml(M_DICT_PATH)
+    data = replace_with_best_match(data, make_dict)
+    make_dict_hard = read_yaml(M_DICT_H_PATH)
+    data = replace_with_hard(data, make_dict_hard)
+    data = categorize_top_n(data)
     data = drop_cols(data, cols)
     data = filter_na(data)
 
@@ -301,5 +349,7 @@ def preprocessor(data_path: Path, cols: List[str]) -> pd.DataFrame:
 
 
 if __name__ == "__main__":
-    data = preprocessor(DATA_PATH, DROP_COLS)
-    data.to_csv(OUT_PATH, index=False)
+    # data = preprocessor(DATA_PATH, DROP_COLS)
+    data = preprocessor("../../data/file65ef3a759daf.arff", DROP_COLS)
+    # data.to_csv(OUT_PATH, index=False)
+    data.to_csv("../../data/data.csv", index=False)
