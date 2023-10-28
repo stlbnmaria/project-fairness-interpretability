@@ -1,7 +1,9 @@
+import re
 from pathlib import Path
 from typing import List, Tuple
 
 import pandas as pd
+from fuzzywuzzy import fuzz, process
 from scipy.io.arff import loadarff
 from scipy.io.arff._arffread import MetaData
 
@@ -117,6 +119,109 @@ def transform_label(df: pd.DataFrame) -> pd.DataFrame:
     df = df[df["Violation.Type"] != "SERO"].copy()
     df["Citation"] = df.loc[:, "Violation.Type"].apply(lambda x: 1 if x == "Citation" else 0)
     df = df.drop(columns=["Violation.Type"])
+    return df
+
+
+def convert_float_to_int(df: pd.DataFrame, column_name: str) -> pd.DataFrame:
+    """If possible to convert float to int converts to int.
+
+    Args:
+        df (pd.DataFrame): df of which column should be converted
+        column_name (str): column name that should be converted to int
+    """
+    if df[column_name].dropna().apply(lambda x: x.is_integer()).all():
+        df[column_name] = df[column_name].fillna(-1).astype(int)
+    else:
+        print("Can't be converted to int")
+
+    return df
+
+
+def clean_string(s: str) -> str:
+    """Cleans the string by converting to lowercase and removing alphabetical values.
+
+    Args:
+        s (string): the string that should be changes
+
+    Returns:
+        string: converted string t
+    """
+    # Remove non-alphanumeric characters and convert to lowercase
+    s = re.sub(r"[^a-zA-Z0-9\s]", "", s)
+    s = s.lower()
+    return s
+
+
+# Function to find the best match
+def replace_with_best_match(
+    df: pd.DataFrame, column_name: str, choices: dict, threshold: int = 50
+) -> pd.DataFrame:
+    """Finds best match between value of the dataframe & of dictionary.
+
+    Args:
+        df (pd.DataFrame): The input DataFrame where one column should
+        be replaced with its best match from the choices dictionary.
+
+        column_name (str): The name of column that should be replaced with it's best match
+        choices (dict):  A dicitionary in which the values
+        of a row are similar words or choices for matching with the respective value of the column
+        threshold (int, optional): The threshold set for
+        the similarity score between the column value and the choices. Defaults to 50.
+    """
+
+    def get_best_match(value: str) -> str:
+        """Finds the best match for a given value within the choices.
+
+        Args:
+            value (str): The value to find the best match for.
+
+        Returns:
+            str: The best match for the input value.
+        """
+        if not value or len(value) < 3:  # Skip empty strings and very short strings
+            return value, 0
+
+        # Clean the input value
+        value = clean_string(value)
+        # Clean the choices
+        cleaned_choices = [clean_string(choice) for choice in choices]
+
+        # Use fuzz.token_set_ratio for better token matching
+        best_match, score = process.extractOne(value, cleaned_choices, scorer=fuzz.token_set_ratio)
+
+        if score >= threshold:
+            best_match = best_match
+        else:
+            best_match = value
+
+        return best_match
+
+    df[column_name] = df[column_name].apply(lambda x: get_best_match(x))
+
+    return df
+
+
+def categorize_top_n(df: pd.DataFrame, column_name: str, n: int) -> pd.DataFrame:
+    """Keep top n classes & missing values and set rest of categories as other.
+
+    Args:
+        df (pd.DataFrame): The df used
+        column_name (str): The name of the column that should be recategorized
+        n (_type_): _description_
+
+    Returns:
+        pd.DataFrame: returns dataframe with limited number of classes
+    """
+    # get the value counts for the specified column
+    value_counts = df[column_name].value_counts()
+
+    # get top n categories
+    top_n_categories = value_counts.index[:n].tolist()
+    top_n_categories.append("?")
+
+    # repalce categories not in top n with 'Other'
+    df[column_name] = df[column_name].apply(lambda x: x if x in top_n_categories else "Other")
+
     return df
 
 
