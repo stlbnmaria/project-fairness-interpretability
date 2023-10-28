@@ -21,8 +21,7 @@ requires-python = ">=3.9"
 "Homepage" = "https://github.com/stlbnmaria/project-fairness-interpretability"
 
 [tool.setuptools]
-# TODO: complete here, e.g. ["src", "config"]
-packages = []
+packages = ["src", "config"]
 
 [tool.ruff]
 select = [
