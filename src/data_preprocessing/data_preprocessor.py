@@ -196,4 +196,4 @@ def preprocessor(data_path: Path, cols: List[str]) -> pd.DataFrame:
 
 if __name__ == "__main__":
     data = preprocessor(DATA_PATH, DROP_COLS)
-    data.to_csv(OUT_PATH)
+    data.to_csv(OUT_PATH, index=False)
