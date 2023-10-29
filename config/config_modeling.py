@@ -6,6 +6,7 @@ RANDOM_STATE = 42
 
 # modeling
 EXPERIMENT = "Final Models"
+RUN_NAME = "Random Forest - Base"
 MODEL_NAME = "Random Forest"
 PARAMS = {}
 
