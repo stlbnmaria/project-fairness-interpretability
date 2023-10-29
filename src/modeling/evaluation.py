@@ -9,7 +9,7 @@ from sklearn.metrics import (
 )
 
 
-def auc_score(y: pd.Series = None, pred_probs: np.ndarray = None) -> float:
+def auc_score(y: pd.Series, pred_probs: np.ndarray) -> float:
     """Computes the AUC metric, given the true y values and the predicted probabilities(pred_probs).
 
     Parameters
@@ -28,7 +28,7 @@ def auc_score(y: pd.Series = None, pred_probs: np.ndarray = None) -> float:
     return AUC
 
 
-def accuracy(y: pd.Series = None, preds: np.ndarray = None) -> float:
+def accuracy(y: pd.Series, preds: np.ndarray) -> float:
     """Computes the Accuracy metric, given the true y values and the predicted labels(preds).
 
     Parameters
@@ -47,7 +47,7 @@ def accuracy(y: pd.Series = None, preds: np.ndarray = None) -> float:
     return Acc
 
 
-def precision(y: pd.Series = None, preds: np.ndarray = None) -> float:
+def precision(y: pd.Series, preds: np.ndarray) -> float:
     """Computes the Precision metric, given the true y values and the predicted labels(preds).
 
     Parameters
@@ -66,7 +66,7 @@ def precision(y: pd.Series = None, preds: np.ndarray = None) -> float:
     return precision
 
 
-def recall(y: pd.Series = None, preds: np.ndarray = None) -> float:
+def recall(y: pd.Series, preds: np.ndarray) -> float:
     """Computes the Recall metric, given the true y values and the predicted labels(preds).
 
     Parameters
@@ -85,7 +85,7 @@ def recall(y: pd.Series = None, preds: np.ndarray = None) -> float:
     return recall
 
 
-def f1(y: pd.Series = None, preds: np.ndarray = None) -> float:
+def f1(y: pd.Series, preds: np.ndarray) -> float:
     """Computes the F1 score, given the true y values and the predicted labels(preds).
 
     Parameters
@@ -104,9 +104,7 @@ def f1(y: pd.Series = None, preds: np.ndarray = None) -> float:
     return f1
 
 
-def eval_metrics(
-    y: pd.Series = None, preds: np.ndarray = None, pred_probs: np.ndarray = None
-) -> dict[str, float]:
+def eval_metrics(y: pd.Series, preds: np.ndarray, pred_probs: np.ndarray) -> dict[str, float]:
     """Given the true y, predicted labels and probs, returns a dict with the different metrics.
 
     Parameters
