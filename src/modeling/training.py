@@ -8,7 +8,7 @@ from sklearn.tree import DecisionTreeClassifier
 
 
 def get_model(
-    model_name: str,
+    model_name: str = None,
 ) -> Union[RandomForestClassifier, LogisticRegression, DecisionTreeClassifier, LogisticGAM]:
     """Creates an ML model based on the model given as string.
 
@@ -35,7 +35,7 @@ def get_model(
 
 
 def training(
-    model_name: str, X_train: pd.DataFrame, y_train: pd.Series
+    model_name: str = None, X_train: pd.DataFrame = None, y_train: pd.Series = None
 ) -> Union[RandomForestClassifier, LogisticRegression, DecisionTreeClassifier, LogisticGAM]:
     """Given the name of the ML model we want, creats the model, and fits it to X_train and Y_train.
 
