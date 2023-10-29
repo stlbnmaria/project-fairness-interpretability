@@ -2,17 +2,39 @@ import argparse
 from pathlib import Path
 
 from config.config_data import OUT_PATH
-from config.config_modeling import RANDOM_STATE, TEST_FROM_VAL, TRAIN_SIZE
+from config.config_modeling import (
+    CAT_COLS,
+    MODEL_NAME,
+    RANDOM_STATE,
+    TEST_FROM_VAL,
+    THRESHOLD,
+    TRAIN_SIZE,
+)
 from data_preprocessing.create_data_split import split_data
+from modeling.evaluation import eval_metrics
+from modeling.inference import inference
+from modeling.training import training
 
 
 def main(data_path: Path, train_size: float, test_size: float, random_state: int) -> None:
-    split_data(
+    # dummy encoding and data split
+    data = split_data(
+        cols=CAT_COLS,
         data_path=data_path,
         train_size=train_size,
         test_size=test_size,
         random_state=random_state,
     )
+
+    # training
+    model = training(model_name=MODEL_NAME, X_train=data["train"][0], y_train=data["train"][1])
+
+    # predictions and evalutation
+    for state in ["train", "val", "test"]:
+        preds_prob = inference(model=model, X=data[state][0])
+        preds = preds_prob[:, 1] > THRESHOLD
+        metrics = eval_metrics(data[state][1], preds, preds_prob)
+        print(metrics)
 
 
 if __name__ == "__main__":
