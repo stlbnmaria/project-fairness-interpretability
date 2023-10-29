@@ -8,23 +8,14 @@ from fuzzywuzzy import fuzz, process
 from scipy.io.arff import loadarff
 from scipy.io.arff._arffread import MetaData
 
-# import sys
-from config.config_data import (  # , DATA_PATH, OUT_PATH
+from config.config_data import (
+    DATA_PATH,
     DROP_COLS,
     M_DICT_H_PATH,
     M_DICT_PATH,
     N_CATEGORIES,
+    OUT_PATH,
 )
-
-# sys.path.append("../../")
-# from config.config_data import (  # , DATA_PATH, OUT_PATH
-#     DROP_COLS,
-#     M_DICT_H_PATH,
-#     M_DICT_PATH,
-#     N_CATEGORIES,
-# )
-
-# from config.config_data import DATA_PATH, DROP_COLS, OUT_PATH
 
 
 def load_data(path_: Path) -> Tuple[pd.DataFrame, MetaData]:
@@ -349,7 +340,5 @@ def preprocessor(data_path: Path, cols: List[str]) -> pd.DataFrame:
 
 
 if __name__ == "__main__":
-    # data = preprocessor(DATA_PATH, DROP_COLS)
-    data = preprocessor("../../data/file65ef3a759daf.arff", DROP_COLS)
-    # data.to_csv(OUT_PATH, index=False)
-    data.to_csv("../../data/data.csv", index=False)
+    data = preprocessor(DATA_PATH, DROP_COLS)
+    data.to_csv(OUT_PATH, index=False)
