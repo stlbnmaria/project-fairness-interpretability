@@ -393,6 +393,9 @@ def preprocessor(data_path: Path, cols: List[str]) -> pd.DataFrame:
         data = replace_with_hard(data, dict_hard[key], column=key)
         data = categorize_top_n(data, column_name=key, n=N_CATEGORIES)
 
+    # transform native american to other category and only keep top 4 explicit
+    data = categorize_top_n(data, column_name="Race", n=4)
+
     # drop unwished cols
     data = drop_cols(data, cols)
 
