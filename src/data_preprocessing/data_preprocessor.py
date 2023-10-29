@@ -1,3 +1,4 @@
+import datetime
 import re
 from pathlib import Path
 from typing import List, Tuple
@@ -149,6 +150,11 @@ def convert_float_to_int(df: pd.DataFrame, column_name: str = "Year") -> pd.Data
         df[column_name].dropna().apply(lambda x: x.is_integer()).all()
     ), "Can't be converted to int"
     df[column_name] = df[column_name].fillna(-1).astype(int)
+
+    # get today's year and filter by -1 (na), above 1990 or below/equal today's year
+    year = int(datetime.date.today().strftime("%Y"))
+    df = df[(df[column_name] == -1) | ((df[column_name] > 1990) & (df[column_name] <= year))]
+
     return df
 
 
