@@ -18,17 +18,12 @@ from config.config_data import (
 )
 
 # TODO: created nested dict for yaml with append; push dicts afterwards
-# TODO: check that hard code dict works bc of capitalization -> Other also still capitalised?
 # TODO: replace docstrings and take out nested function for replace_with_best_match
 # TODO: create docstrings for replace with hard -> also think about reverting the dict for
 #       readability see
 #       https://stackoverflow.com/questions/483666/reverse-invert-a-dictionary-mapping
 # TODO: include color and vehicle type in here by iterating over in config
 #       defined grouping cols
-# TODO: rename EDA notebook to group finding or something and create proper EDA notebook for
-#       actual EDA on processed data
-# TODO: think of how to sample the data - not more than 20k observations
-# TODO: do EDA with correlations plot, distributions, etc
 
 
 def load_data(path_: Path) -> Tuple[pd.DataFrame, MetaData]:
@@ -255,6 +250,16 @@ def replace_with_best_match(
 
 
 def replace_with_hard(data: pd.DataFrame, dict_hard: dict, column: str = "Make") -> pd.DataFrame:
+    """Replaces existing categories based on a hard encoded dictionary.
+
+    Args:
+        data (pd.DataFrame): The df that should be changed
+        dict_hard (dict): The dict that will be used to change the values of a column
+        column (str, optional): The column that will be changed. Defaults to "Make".
+
+    Returns:
+        pd.DataFrame: The df with the changes to a column is returned
+    """
     data[column] = data[column].replace(dict_hard)
     return data
 
@@ -283,8 +288,8 @@ def categorize_top_n(df: pd.DataFrame, column_name: str = "Make", n: int = 10) -
     top_n_categories = value_counts.index[:n].tolist()
     top_n_categories.append("?")
 
-    # repalce categories not in top n with 'Other'
-    df[column_name] = df[column_name].apply(lambda x: x if x in top_n_categories else "Other")
+    # repalce categories not in top n with 'other'
+    df[column_name] = df[column_name].apply(lambda x: x if x in top_n_categories else "other")
 
     return df
 
@@ -364,6 +369,10 @@ def preprocessor(data_path: Path, cols: List[str]) -> pd.DataFrame:
     make_dict_hard = read_yaml(M_DICT_H_PATH)
     data = replace_with_hard(data, make_dict_hard)
     data = categorize_top_n(data, n=N_CATEGORIES)
+
+    # for key in make_dict_hard.keys():
+    #     data = replace_with_hard(data, make_dict_hard, column=key)
+    #     data = categorize_top_n(data, n=N_CATEGORIES, column_name=key)
     data = drop_cols(data, cols)
     data = filter_na(data)
 
