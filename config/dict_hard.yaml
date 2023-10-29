@@ -1,0 +1,71 @@
+Color:
+  '?':
+  - '?'
+  BOLD COLORS:
+  - RED
+  - MAROON
+  - GREEN
+  - GOLD
+  - BLUE
+  - GREEN LGT
+  - YELLOW
+  - ORANGE
+  - BRONZE
+  - PURPLE
+  - MULTICOLOR
+  - PINK
+  - COPPER
+  - CHROME
+  - CAMOUFLAGE
+  DARK COLORS:
+  - BLACK
+  - GRAY
+  - BLUE DARK
+  - GREEN DK
+  - BROWN
+  LIGHT COLORS:
+  - SILVER
+  - WHITE
+  - BLUE LIGHT
+  - TAN
+  - BEIGE
+  - CREAM
+Make:
+  isuzu:
+  - ISU
+  - ISUZ
+  mercedes:
+  - MERZ BENZ
+  - BENZ
+  - MBENZ
+  volkswagen:
+  - VW
+  - WV
+VehicleType:
+  '?':
+  - 29 - Unknown
+  Motorcycles:
+  - 01 - Motorcycle
+  - 19 - Moped
+  Standard Vehicles:
+  - 02 - Automobile
+  - 03 - Station Wagon
+  - 04 - Limousine
+  Trucks:
+  - 05 - Light Duty Truck
+  - 06 - Heavy Duty Truck
+  - 20 - Commercial Rig
+  other:
+  - 28 - Other
+  - 24 - Camper
+  - 26 - Boat Trailer
+  - 08 - Recreational Vehicle
+  - 21 - Tandem Trailer
+  - 25 - Utility Trailer
+  - 09 - Farm Vehicle
+  - 07 - Truck/Road Tractor
+  - 27 - Farm Equipment
+  - 10 - Transit Bus
+  - 12 - School Bus
+  - 11 - Cross Country Bus
+  - 14 - Ambulance(Non-Emerg)
