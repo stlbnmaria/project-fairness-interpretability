@@ -10,20 +10,12 @@ from scipy.io.arff._arffread import MetaData
 
 from config.config_data import (
     DATA_PATH,
+    DICT_H_PATH,
+    DICT_PATH,
     DROP_COLS,
-    M_DICT_H_PATH,
-    M_DICT_PATH,
     N_CATEGORIES,
     OUT_PATH,
 )
-
-# TODO: created nested dict for yaml with append; push dicts afterwards
-# TODO: replace docstrings and take out nested function for replace_with_best_match
-# TODO: create docstrings for replace with hard -> also think about reverting the dict for
-#       readability see
-#       https://stackoverflow.com/questions/483666/reverse-invert-a-dictionary-mapping
-# TODO: include color and vehicle type in here by iterating over in config
-#       defined grouping cols
 
 
 def load_data(path_: Path) -> Tuple[pd.DataFrame, MetaData]:
@@ -174,9 +166,9 @@ def read_yaml(path: Path) -> dict:
             Yaml file loaded as dict.
     """
     with open(path, "r") as yaml_file:
-        make_match_dictionary = yaml.load(yaml_file, Loader=yaml.FullLoader)
+        dictionary = yaml.load(yaml_file, Loader=yaml.FullLoader)
 
-    return make_match_dictionary
+    return dictionary
 
 
 def clean_string(s: str) -> str:
@@ -198,73 +190,97 @@ def clean_string(s: str) -> str:
     return s
 
 
+def get_best_match(value: str, choices: dict, threshold: int = 50) -> str:
+    """Finds the best match for a given value within the choices.
+
+    Parameters
+    -------
+    value : str
+        The value to find the best match for.
+    choices : dict
+        A dicitionary in which the values
+    choices : dict
+        A dicitionary in which the values of a row are similar words or
+        choices for matching with the respective value of the column.
+    threshold : int
+        The threshold set for the similarity score between the
+        column value and the choices. Defaults to 50.
+
+    Returns
+    -------
+    best_match : str
+        The best match for the input value.
+    """
+    if not value or len(value) < 3:  # Skip empty strings and very short strings
+        return value
+
+    # Clean the input value
+    value = clean_string(value)
+    # Clean the choices
+    cleaned_choices = [clean_string(choice) for choice in choices]
+
+    # Use fuzz.token_set_ratio for better token matching
+    best_match, score = process.extractOne(value, cleaned_choices, scorer=fuzz.token_set_ratio)
+
+    if score >= threshold:
+        best_match = best_match
+    else:
+        best_match = value
+
+    return best_match
+
+
 def replace_with_best_match(
-    df: pd.DataFrame,
-    choices: dict,
-    threshold: int = 50,
-    column_name: str = "Make",
+    df: pd.DataFrame, column_name: str, choices: dict, threshold: int = 50
 ) -> pd.DataFrame:
     """Finds best match between value of the dataframe & of dictionary.
 
-    Args:
-        df (pd.DataFrame): The input DataFrame where one column should
-        be replaced with its best match from the choices dictionary.
+    Parameters
+    -------
+    df : pd.DataFrame
+        The input DataFrame where one column should.
+    column_name : str
+        The name of column that should be replaced with it's best match.
+    choices : dict
+        A dicitionary in which the values of a row are similar words or
+        choices for matching with the respective value of the column.
+    threshold : int
+        The threshold set for the similarity score between the
+        column value and the choices. Defaults to 50.
 
-        column_name (str): The name of column that should be replaced with it's best match
-        choices (dict):  A dicitionary in which the values
-        of a row are similar words or choices for matching with the respective value of the column
-        threshold (int, optional): The threshold set for
-        the similarity score between the column value and the choices. Defaults to 50.
+    Returns
+    -------
+    data : pd.DataFrame
+        Transofrmed dataframe.
     """
-
-    def get_best_match(value: str) -> str:
-        """Finds the best match for a given value within the choices.
-
-        Args:
-            value (str): The value to find the best match for.
-
-        Returns:
-            str: The best match for the input value.
-        """
-        if not value or len(value) < 3:  # Skip empty strings and very short strings
-            return value, 0
-
-        # Clean the input value
-        value = clean_string(value)
-        # Clean the choices
-        cleaned_choices = [clean_string(choice) for choice in choices]
-
-        # Use fuzz.token_set_ratio for better token matching
-        best_match, score = process.extractOne(value, cleaned_choices, scorer=fuzz.token_set_ratio)
-
-        if score >= threshold:
-            best_match = best_match
-        else:
-            best_match = value
-
-        return best_match
-
-    df[column_name] = df[column_name].apply(lambda x: get_best_match(x))
+    df[column_name] = df[column_name].apply(lambda x: get_best_match(x, choices, threshold))
 
     return df
 
 
-def replace_with_hard(data: pd.DataFrame, dict_hard: dict, column: str = "Make") -> pd.DataFrame:
+def replace_with_hard(data: pd.DataFrame, dict_hard: dict, column: str) -> pd.DataFrame:
     """Replaces existing categories based on a hard encoded dictionary.
 
-    Args:
-        data (pd.DataFrame): The df that should be changed
-        dict_hard (dict): The dict that will be used to change the values of a column
-        column (str, optional): The column that will be changed. Defaults to "Make".
+    Parameters
+    -------
+    data : pd.DataFrame
+        Dataframe to transform.
+    dict_hard : dict
+        Dict that will be used to change the values of a column.
+    column : str
+        The column that will be changed.
 
-    Returns:
-        pd.DataFrame: The df with the changes to a column is returned
+    Returns
+    -------
+    data : pd.DataFrame
+        Transofrmed dataframe.
     """
-    data[column] = data[column].replace(dict_hard)
+    inv_map = {val: k for k, v in dict_hard.items() for val in v}
+    data[column] = data[column].replace(inv_map)
     return data
 
 
-def categorize_top_n(df: pd.DataFrame, column_name: str = "Make", n: int = 10) -> pd.DataFrame:
+def categorize_top_n(df: pd.DataFrame, column_name: str, n: int = 10) -> pd.DataFrame:
     """Keep top n classes & missing values and set rest of categories as other.
 
     Parameters
@@ -359,21 +375,31 @@ def preprocessor(data_path: Path, cols: List[str]) -> pd.DataFrame:
     data : pd.DataFrame
             Processed data.
     """
+    # load the data
     data, _ = load_data(data_path)
-    data = change_to_numeric(data)
-    data = feature_engineering(data)
-    data = transform_label(data)
-    data = convert_float_to_int(data)
-    make_dict = read_yaml(M_DICT_PATH)
-    data = replace_with_best_match(data, make_dict)
-    make_dict_hard = read_yaml(M_DICT_H_PATH)
-    data = replace_with_hard(data, make_dict_hard)
-    data = categorize_top_n(data, n=N_CATEGORIES)
 
-    # for key in make_dict_hard.keys():
-    #     data = replace_with_hard(data, make_dict_hard, column=key)
-    #     data = categorize_top_n(data, n=N_CATEGORIES, column_name=key)
+    # convert yes/no to 0/1 and year to int
+    data = change_to_numeric(data)
+    data = convert_float_to_int(data)
+
+    # perform feature engineering on state columns
+    data = feature_engineering(data)
+
+    # preform refactroing and grouping on certain columns
+    make_dict = read_yaml(DICT_PATH)["Make"]
+    data = replace_with_best_match(data, "Make", make_dict)
+    dict_hard = read_yaml(DICT_H_PATH)
+    for key in dict_hard.keys():
+        data = replace_with_hard(data, dict_hard[key], column=key)
+        data = categorize_top_n(data, column_name=key, n=N_CATEGORIES)
+
+    # drop unwished cols
     data = drop_cols(data, cols)
+
+    # transform label to 0/1 for citation
+    data = transform_label(data)
+
+    # filter na
     data = filter_na(data)
 
     return data
