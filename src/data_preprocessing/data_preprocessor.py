@@ -355,7 +355,7 @@ def filter_na(df: pd.DataFrame) -> pd.DataFrame:
     # filter out ? in string columns
     cols = df.select_dtypes([object]).columns
     for col in cols:
-        df = df[df[col] != "?"].copy()
+        df = df[~df[col].isin(["U", "?"])].copy()
 
     return df
 
