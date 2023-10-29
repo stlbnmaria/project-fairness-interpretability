@@ -36,5 +36,5 @@ python src/data_preprocessing/data_preprocessor.py
 ## Modeling
 The paramters can be changed in the `config/config_modeling.py`. Run the training with mlflow tracking with the following command:
 ```bash
-python src/main.py
+python src/modeling.py
 ```
