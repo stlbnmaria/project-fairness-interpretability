@@ -2,6 +2,11 @@ import argparse
 from pathlib import Path
 from typing import List
 
+from create_data_split import split_data
+from evaluation import eval_metrics
+from inference import inference
+from training import training
+
 from config.config_data import OUT_PATH
 from config.config_modeling import (
     CAT_COLS,
@@ -11,10 +16,6 @@ from config.config_modeling import (
     THRESHOLD,
     TRAIN_SIZE,
 )
-from data_preprocessing.create_data_split import split_data
-from modeling.evaluation import eval_metrics
-from modeling.inference import inference
-from modeling.training import training
 
 
 def main(
