@@ -1,0 +1,298 @@
+Make:
+  Acura:
+  - ACURA
+  - ACUR
+  - ACRUA
+  - ACRURA
+  - ACCORD
+  - ACRURA
+  Audi:
+  - AUDI
+  - AUD
+  BMW:
+  - BMW
+  - BWM
+  - BOMW
+  Buick:
+  - BUICK
+  - BRUICK
+  - BUIK
+  - BUK
+  Cadillac:
+  - CADILLAC
+  - CADI
+  - CADDI
+  - CADIALLAC
+  - CADDILLAC
+  Chevrolet:
+  - CHEVROLET
+  - CHEVEROLET
+  - CHEV
+  - CHEVY
+  - CHEVEROLET
+  - CEHVY
+  - CHECROLET
+  - CHE V
+  - CHEVOLRET
+  - CHEVRLET
+  - CHEVROLETE
+  - CHEVR
+  - CHEVROLT
+  - CHEVROLER
+  - CHEVROLERT
+  - CHECEVY
+  - CHECHY
+  - CHECY
+  - CEVEROLET
+  - CEVY
+  - CHEVORLET
+  - CHEVTOLET
+  - CHEVY GEO
+  - CHECROLET
+  Chrysler:
+  - CHRYSLER
+  - CHRY
+  - CHRSYLER
+  - CHRYS
+  - CHYRSLER
+  - CHRUSLER
+  - CHY
+  - CHYR
+  - CHRYSLTER
+  Dodge:
+  - DODGE
+  - DODGEI
+  - DOSGE
+  - DDGE
+  Ford:
+  - FORD
+  Freightliner:
+  - FRGHT
+  - FRHT
+  - FRIGHTLINER
+  - FREI
+  - FREIGHT
+  - FREIGHTTK
+  - FREIGHTLINRT
+  - FREIGHTLINER
+  - FREIGHTTK
+  Honda:
+  - HONDA
+  - HONNDA
+  - HNDA
+  - HON
+  - HOND
+  - HONDA 4D
+  Hyundai:
+  - HYUNDAI
+  - HUNDAI
+  - HYANDAI
+  - HUNDAII
+  - HYUND
+  - HYUN
+  - HYUNDIA
+  - HYUNVA
+  - HYUANDAI
+  - HYNDIA
+  - HYINDAI
+  - HYUANDAI
+  Infiniti:
+  - INFINITI
+  - INFI
+  - INFINIT
+  - INFIITI
+  - INFINIITI
+  Jaguar:
+  - JAGUAR
+  - JAG
+  - JAGU
+  Jeep:
+  - JEEP
+  - JEEK
+  - JEEF
+  - JEEPQ
+  - JEE
+  Kia:
+  - KIA
+  - KARA
+  - GENEVAL2003
+  - KYMCO
+  Lamborghini:
+  - LAMBORGHINI
+  - LAMBO
+  Land Rover:
+  - LNDR
+  Lexus:
+  - LEXUS
+  - LEXS
+  - LEXUS4D
+  - LEXU
+  - LEXSUS
+  - LEVUS
+  - LRXUS
+  Lincoln:
+  - LINCOLN
+  - LINOLN
+  - LINC
+  - LINCLN
+  Lobo:
+  - LOBO
+  Lotus:
+  - LOTUS
+  - LOTU
+  Mazda:
+  - MAZDA
+  - MAZAD
+  - MAZA
+  - MADZA
+  - MAD
+  - MADZ
+  - MADZDA
+  - MAZVA
+  - MAZVA
+  - MAZS
+  - MAZDVAL2010
+  - MAZDVA
+  - MADZA
+  - MAZDVAL2010
+  - MAZSA
+  - MAZDA
+  - MAZDVA
+  - MAZVAL2010
+  - MAZDA
+  - MAZSA
+  - MAZDA
+  - MAZDA
+  - MAZVAL2010
+  - MAZVA
+  - MAZVAL2010
+  - MAZDA
+  - MAZDVAL2010
+  Mercedes:
+  - MERCEDES
+  - MERZ BENZ
+  - MERCEDEZ
+  - MERCEDESBENZ
+  - MERC BENZ
+  - MERCEDS BENZ
+  - MERCADES
+  - MECEDES
+  - MERCVAL2013
+  - MERCURY
+  - MERCER
+  - MERCZ
+  - MERZ
+  - MERK
+  - MERECEDES
+  - MERCERY
+  - MERCADES
+  - MERCADES
+  - MERCADES
+  - MERCADES
+  - MERCVAL2013
+  - MERCADES
+  - MERCERY
+  Mini:
+  - MINI
+  - MINN
+  - MNNI
+  - MINICOOP
+  - MINI COOPER
+  Mitsubishi:
+  - MITSUBISHI
+  - MITSUBIHI
+  - MITSUBIHI
+  - MITS
+  - MITSUBIHI
+  - MITSH
+  - MITSUH
+  - MITSUBASHI
+  - MITSU
+  - MITSUBIHI
+  - MITSB
+  - MISTUBISHI
+  - MISTUBISHI
+  - MITSUBISH
+  - MIST
+  - MITSUBISHU
+  - MITSUBISH
+  - MITSUBISI
+  Nissan:
+  - NISSAN
+  - NISSON
+  - NISAN
+  - NISS
+  - NISSAB
+  - NIIS
+  - NISSAM
+  - NISSN
+  - NISSS
+  - NSSIAN
+  - NISSVAL1996
+  - NISSVAL1999
+  Plymouth:
+  - PLYMOUTH
+  - PLYM
+  Porsche:
+  - PORSCHE
+  - PORSCHE
+  Range Rover:
+  - RANGE ROVER
+  - RANG ROVER
+  - RANGEROVER
+  Rolls Royce:
+  - ROLLS ROYCE
+  SAAB:
+  - SAAB
+  - SAA
+  Subaru:
+  - SUBARU
+  - SUBA
+  - SUBUARU
+  Tesla:
+  - TESLA
+  - TESCA
+  Toyota:
+  - TOYOTA
+  - TOYOTA
+  - TOYTA
+  - TOYT
+  - TOYOYA
+  - TOTY
+  - TOYO
+  Volkswagen:
+  - VOLKSWAGEN
+  - VOLKS
+  - VW
+  - VOLK
+  - VOLKSWAGON
+  - VOLKVAL2012
+  - VOLVAL2012
+  - VOLKS
+  - VOLKE
+  - VOLKW
+  - VOLKSW
+  - VOLKSWAG
+  - VOLKSWA
+  - VOLKSW
+  - VOLKSWA
+  - VOLKSWAGGON
+  - VOLKSWAGONQ
+  - VOLKSWAGGON
+  - VWAGON
+  - VOLK
+  - VOLVSWAGEN
+  - VOLKSWAGOM
+  - VOLKA
+  - VWOLKS
+  - VOLKSWAGO
+  - VOKS
+  - VOLKS
+  - VWAGON
+  Volvo:
+  - VOLV0
+  - VOLKS
+  - VOLVO
+  - VOLVO TK
+  - VOLVOT
+  - VOLVO SW
