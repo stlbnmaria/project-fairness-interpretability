@@ -5,6 +5,7 @@ TEST_FROM_VAL = 0.5
 RANDOM_STATE = 42
 
 # modeling
+EXPERIMENT = "Final Models"
 MODEL_NAME = "Random Forest"
 PARAMS = {}
 
