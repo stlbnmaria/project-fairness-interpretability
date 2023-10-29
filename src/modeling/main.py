@@ -1,6 +1,6 @@
 import argparse
 from pathlib import Path
-from typing import List
+from typing import List, Union
 
 import mlflow
 from create_data_split import split_data
@@ -13,6 +13,7 @@ from config.config_modeling import (
     CAT_COLS,
     EXPERIMENT,
     MODEL_NAME,
+    PARAMS,
     RANDOM_STATE,
     RUN_NAME,
     TEST_FROM_VAL,
@@ -30,6 +31,7 @@ def main(
     test_size: float,
     random_state: int,
     model_name: str,
+    params: dict[str, Union[float, int, bool]],
     threshold: float,
 ) -> None:
     # validate that mlflow runs locally
@@ -39,8 +41,6 @@ def main(
     mlflow.set_experiment(experiment)
 
     with mlflow.start_run(run_name=run_name):
-        # set tags
-        mlflow.set_tag("Task_type", "Regression")
         # dummy encoding and data split
         data = split_data(
             cols=cat_cols,
@@ -51,8 +51,10 @@ def main(
         )
 
         # training
-        model = training(model_name=model_name, X_train=data["train"][0], y_train=data["train"][1])
-        # TODO: log model params
+        model = training(
+            model_name=model_name, X_train=data["train"][0], y_train=data["train"][1], params=params
+        )
+        mlflow.log_params(params)
 
         # predictions and evalutation
         for state in ["train", "val", "test"]:
@@ -79,6 +81,7 @@ if __name__ == "__main__":
     )
     parser.add_argument("--random_state", default=RANDOM_STATE, help="Random state of data split")
     parser.add_argument("--model_name", default=MODEL_NAME, help="Model name for training")
+    parser.add_argument("--params", default=PARAMS, help="Parameters for model")
     parser.add_argument(
         "--threshold", default=THRESHOLD, help="Threshold for probability predictions"
     )
@@ -94,5 +97,6 @@ if __name__ == "__main__":
         test_size=args.test_size,
         random_state=args.random_state,
         model_name=args.model_name,
+        params=args.params,
         threshold=args.threshold,
     )

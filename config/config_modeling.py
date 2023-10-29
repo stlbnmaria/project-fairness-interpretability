@@ -8,7 +8,7 @@ RANDOM_STATE = 42
 EXPERIMENT = "Final Models"
 RUN_NAME = "Random Forest - Base"
 MODEL_NAME = "Random Forest"
-PARAMS = {}
+PARAMS = {"max_depth": 50, "ccp_alpha": 0.001, "max_samples": 0.8}
 
 # inference
 THRESHOLD = 0.5
