@@ -6,8 +6,8 @@ from sklearn.model_selection import train_test_split
 
 
 def dummy_encoder(
-    df: pd.DataFrame = None,
-    cols: list = None,
+    df: pd.DataFrame,
+    cols: list,
 ) -> pd.DataFrame:
     """Encode the categorical variables within the dataframe.
 
@@ -31,7 +31,6 @@ def split_data(
     cols: list = None,
     data_path: Path = None,
     df: pd.DataFrame = None,
-    dummy_encoding: bool = True,
     train_size: float = 0.6,
     test_size: float = 0.5,
     random_state: int = 42,
@@ -46,8 +45,6 @@ def split_data(
             Path to the data.
     df : pd.DataFrame
             Dataframe to split.
-    dummy_encoding: bool
-            Boolean variable which represents wheher dummy eocnidng should be done.
     train_size : float
             Percentage of whole data used for training.
     test_size : float
@@ -70,7 +67,7 @@ def split_data(
         df = pd.read_csv(data_path)
 
     # dummy encoding
-    if dummy_encoding:
+    if cols:
         df = dummy_encoder(df, cols)
 
     # create split betweeen train and val-test

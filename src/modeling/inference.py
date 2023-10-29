@@ -9,13 +9,11 @@ from sklearn.tree import DecisionTreeClassifier
 
 
 def inference(
-    model: Union[
-        RandomForestClassifier, LogisticRegression, DecisionTreeClassifier, LogisticGAM
-    ] = None,
-    X: pd.DataFrame = None,
-    predict_proba: bool = False,
+    model: Union[RandomForestClassifier, LogisticRegression, DecisionTreeClassifier, LogisticGAM],
+    X: pd.DataFrame,
+    predict_proba: bool = True,
 ) -> np.ndarray:
-    """Given X and a model, returns an array containing the predictions(probabilities or labels).
+    """Given X and a model, returns an array containing the predictions.
 
     Parameters
     ----------
