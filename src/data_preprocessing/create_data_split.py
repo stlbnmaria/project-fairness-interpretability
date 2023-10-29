@@ -5,7 +5,7 @@ import pandas as pd
 from sklearn.model_selection import train_test_split
 
 
-def dummy_encoding(
+def dummy_encoder(
     df: pd.DataFrame = None,
     cols: list = None,
 ) -> pd.DataFrame:
@@ -71,7 +71,7 @@ def split_data(
 
     # dummy encoding
     if dummy_encoding:
-        df = dummy_encoding(df, cols)
+        df = dummy_encoder(df, cols)
 
     # create split betweeen train and val-test
     X_train, X_val_test, y_train, y_val_test = train_test_split(
