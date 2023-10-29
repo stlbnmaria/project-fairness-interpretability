@@ -47,16 +47,6 @@ VehicleType:
   Motorcycles:
   - 01 - Motorcycle
   - 19 - Moped
-  Special Purpose:
-  - 21 - Tandem Trailer
-  - 25 - Utility Trailer
-  - 09 - Farm Vehicle
-  - 07 - Truck/Road Tractor
-  - 27 - Farm Equipment
-  - 10 - Transit Bus
-  - 12 - School Bus
-  - 11 - Cross Country Bus
-  - 14 - Ambulance(Non-Emerg)
   Standard Vehicles:
   - 02 - Automobile
   - 03 - Station Wagon
@@ -70,3 +60,12 @@ VehicleType:
   - 24 - Camper
   - 26 - Boat Trailer
   - 08 - Recreational Vehicle
+  - 21 - Tandem Trailer
+  - 25 - Utility Trailer
+  - 09 - Farm Vehicle
+  - 07 - Truck/Road Tractor
+  - 27 - Farm Equipment
+  - 10 - Transit Bus
+  - 12 - School Bus
+  - 11 - Cross Country Bus
+  - 14 - Ambulance(Non-Emerg)
