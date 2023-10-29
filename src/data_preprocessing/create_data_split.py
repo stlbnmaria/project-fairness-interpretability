@@ -4,45 +4,34 @@ from typing import Tuple
 import pandas as pd
 from sklearn.model_selection import train_test_split
 
-def dummy_encoding(data_path: Path = None, df: pd.DataFrame = None, cols: list = ["Color", "Gender", "Make", "Race", "VehicleType"], catboost: bool = False) -> pd.DataFrame:
+
+def dummy_encoding(
+    df: pd.DataFrame = None,
+    cols: list = None,
+) -> pd.DataFrame:
     """Encode the categorical variables within the dataframe.
 
     Parameters
     -------
-    data_path : Path
-            Path to the data.
     df : pd.DataFrame
             Dataframe to split.
     cols : list
             List with the categorical variables we wish to dummy encode.
-    catboost : Bool
-            Represents whether or not we are preparing the data to be used in a catboost model.
 
     Returns
     -------
-    one_hot_df : pd.DataFrame
-            Dataframe with its categorical variables one-hot-encoded(returns the original df if catboost=True).
+    df : pd.DataFrame
+        Dataframe with categorical variables one-hot-encoded(original df if catboost=True).
     """
-
-    # check that at least one has a value
-    assert not (
-        (data_path is None) and (df is None)
-    ), "You need to pass either a path to data or a dataframe."
-    # load data from path
-    if data_path:
-        df = pd.read_csv(data_path)
-    if catboost:
-        return df
-    else:
-        one_hot_df = pd.get_dummies(df, columns = ["Color", "Gender", "Make", "Race", "VehicleType"], dtype=int)
-        return one_hot_df
-
-
+    df = pd.get_dummies(df, cols, dtype=int)
+    return df
 
 
 def split_data(
+    cols: list = None,
     data_path: Path = None,
     df: pd.DataFrame = None,
+    dummy_encoding: bool = True,
     train_size: float = 0.6,
     test_size: float = 0.5,
     random_state: int = 42,
@@ -51,10 +40,14 @@ def split_data(
 
     Parameters
     -------
+    cols : List
+            List of columns to be dummy encoded.
     data_path : Path
             Path to the data.
     df : pd.DataFrame
             Dataframe to split.
+    dummy_encoding: bool
+            Boolean variable which represents wheher dummy eocnidng should be done.
     train_size : float
             Percentage of whole data used for training.
     test_size : float
@@ -75,6 +68,10 @@ def split_data(
     # load data from path
     if data_path:
         df = pd.read_csv(data_path)
+
+    # dummy encoding
+    if dummy_encoding:
+        df = dummy_encoding(df, cols)
 
     # create split betweeen train and val-test
     X_train, X_val_test, y_train, y_val_test = train_test_split(
