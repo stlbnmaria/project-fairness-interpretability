@@ -133,26 +133,37 @@ def transform_label(df: pd.DataFrame) -> pd.DataFrame:
 def convert_float_to_int(df: pd.DataFrame, column_name: str = "Year") -> pd.DataFrame:
     """If possible to convert float to int converts to int.
 
-    Args:
-        df (pd.DataFrame): df of which column should be converted
-        column_name (str): column name that should be converted to int
-    """
-    if df[column_name].dropna().apply(lambda x: x.is_integer()).all():
-        df[column_name] = df[column_name].fillna(-1).astype(int)
-    else:
-        print("Can't be converted to int")
+    Parameters
+    -------
+    df : pd.DataFrame
+            Data to transform.
+    column_name : str
+            Column that should be converted to int.
 
+    Returns
+    -------
+    df : pd.DataFrame
+            Transformed data.
+    """
+    assert (
+        df[column_name].dropna().apply(lambda x: x.is_integer()).all()
+    ), "Can't be converted to int"
+    df[column_name] = df[column_name].fillna(-1).astype(int)
     return df
 
 
 def read_yaml(path: Path) -> dict:
     """Reads yaml file from given path and returns as dict.
 
-    Args:
-        path (Path): the path of the respective yaml file
+    Parameters
+    -------
+    path : Path
+            Path of the respective yaml file.
 
-    Returns:
-        dict: the yaml file reconverted to a dict
+    Returns
+    -------
+    make_match_dictionary : dict
+            Yaml file loaded as dict.
     """
     with open(path, "r") as yaml_file:
         make_match_dictionary = yaml.load(yaml_file, Loader=yaml.FullLoader)
@@ -163,11 +174,15 @@ def read_yaml(path: Path) -> dict:
 def clean_string(s: str) -> str:
     """Cleans the string by converting to lowercase and removing alphabetical values.
 
-    Args:
-        s (string): the string that should be changes
+    Parameters
+    -------
+    s : str
+        String that should be changd.
 
-    Returns:
-        string: converted string t
+    Returns
+    -------
+    s : str
+        Converted string.
     """
     # Remove non-alphanumeric characters and convert to lowercase
     s = re.sub(r"[^a-zA-Z0-9\s]", "", s)
@@ -175,7 +190,7 @@ def clean_string(s: str) -> str:
     return s
 
 
-# Function to find the best match
+# TODO: replace docstrings and take out nested function
 def replace_with_best_match(
     df: pd.DataFrame,
     choices: dict,
@@ -227,23 +242,28 @@ def replace_with_best_match(
     return df
 
 
+# TODO: create docstrings
 def replace_with_hard(data: pd.DataFrame, dict_hard: dict, column: str = "Make") -> pd.DataFrame:
     data[column] = data[column].replace(dict_hard)
     return data
 
 
-def categorize_top_n(
-    df: pd.DataFrame, column_name: str = "Make", n: int = N_CATEGORIES
-) -> pd.DataFrame:
+def categorize_top_n(df: pd.DataFrame, column_name: str = "Make", n: int = 10) -> pd.DataFrame:
     """Keep top n classes & missing values and set rest of categories as other.
 
-    Args:
-        df (pd.DataFrame): The df used
-        column_name (str): The name of the column that should be recategorized
-        n (_type_): _description_
+    Parameters
+    -------
+    df : pd.DataFrame
+        Dataframe to transform.
+    column_name : str
+        Name of the column that should be grouped.
+    n : int
+        Top n categories that shoul be kept explicitly.
 
-    Returns:
-        pd.DataFrame: returns dataframe with limited number of classes
+    Returns
+    -------
+    df : pd.DataFrame
+        Dataframe with limited number of classes.
     """
     # get the value counts for the specified column
     value_counts = df[column_name].value_counts()
@@ -281,9 +301,9 @@ def drop_cols(df: pd.DataFrame, cols: List[str]) -> pd.DataFrame:
 def filter_na(df: pd.DataFrame) -> pd.DataFrame:
     """Filter na-values in full df.
 
-        Since analysis showed that values are missing at random
-        across groups, make less than 1% of instances and instance normally has
-        multiple missing feature values, this operation is valid.
+    Since analysis showed that values are missing at random
+    across groups, make less than 1% of instances and instance normally has
+    multiple missing feature values, this operation is valid.
 
     Parameters
     -------
@@ -332,7 +352,7 @@ def preprocessor(data_path: Path, cols: List[str]) -> pd.DataFrame:
     data = replace_with_best_match(data, make_dict)
     make_dict_hard = read_yaml(M_DICT_H_PATH)
     data = replace_with_hard(data, make_dict_hard)
-    data = categorize_top_n(data)
+    data = categorize_top_n(data, n=N_CATEGORIES)
     data = drop_cols(data, cols)
     data = filter_na(data)
 
