@@ -5,18 +5,34 @@ import pandas as pd
 from pygam import LogisticGAM
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.linear_model import LogisticRegression
+from sklearn.neural_network import MLPClassifier
 from sklearn.tree import DecisionTreeClassifier
+from xgboost import XGBClassifier
 
 
 def inference(
-    model: Union[RandomForestClassifier, LogisticRegression, DecisionTreeClassifier, LogisticGAM],
+    model: Union[
+        RandomForestClassifier,
+        LogisticRegression,
+        DecisionTreeClassifier,
+        LogisticGAM,
+        XGBClassifier,
+        MLPClassifier,
+    ],
     X: pd.DataFrame,
 ) -> np.ndarray:
     """Given X and a model, returns an array containing the predictions.
 
     Parameters
     ----------
-    model: Union[RandomForestClassifier, LogisticRegression, DecisionTreeClassifier, LogisticGAM]
+    model: Union[
+            RandomForestClassifier,
+            LogisticRegression,
+            DecisionTreeClassifier,
+            LogisticGAM,
+            XGBClassifier,
+            MLPClassifier,
+        ]
         Model which will be used to make the predictions.
     X: pd.DataFrame
         Data for which the model will predict the target variable label or probability.

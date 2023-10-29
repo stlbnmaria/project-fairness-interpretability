@@ -4,14 +4,23 @@ import pandas as pd
 from pygam import LogisticGAM
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.linear_model import LogisticRegression
+from sklearn.neural_network import MLPClassifier
 from sklearn.tree import DecisionTreeClassifier
+from xgboost import XGBClassifier
 
-# TODO: add more models - such as one boosting method, logistic decision tree method (?), NN
+# TODO: ADD PLTR
 
 
 def get_model(
     model_name: str,
-) -> Union[RandomForestClassifier, LogisticRegression, DecisionTreeClassifier, LogisticGAM]:
+) -> Union[
+    RandomForestClassifier,
+    LogisticRegression,
+    DecisionTreeClassifier,
+    LogisticGAM,
+    XGBClassifier,
+    MLPClassifier,
+]:
     """Creates an ML model based on the model given as string.
 
     Parameters
@@ -21,7 +30,14 @@ def get_model(
 
     Returns
     -------
-    model: Union[RandomForestClassifier, LogisticRegression, DecisionTreeClassifier, LogisticGAM]
+    model: Union[
+            RandomForestClassifier,
+            LogisticRegression,
+            DecisionTreeClassifier,
+            LogisticGAM,
+            XGBClassifier,
+            MLPClassifier,
+        ]
         ML model we intended to create.
     """
     # white box models
@@ -35,6 +51,10 @@ def get_model(
     # black box models
     elif model_name == "Random Forest":
         model = RandomForestClassifier()
+    elif model_name == "XGB":
+        model = XGBClassifier()
+    elif model_name == "ANN":
+        model = MLPClassifier()
 
     return model
 
@@ -44,7 +64,14 @@ def training(
     X_train: pd.DataFrame,
     y_train: pd.Series,
     params: dict[str, Union[float, int, bool]],
-) -> Union[RandomForestClassifier, LogisticRegression, DecisionTreeClassifier, LogisticGAM]:
+) -> Union[
+    RandomForestClassifier,
+    LogisticRegression,
+    DecisionTreeClassifier,
+    LogisticGAM,
+    XGBClassifier,
+    MLPClassifier,
+]:
     """Given the name of the ML model, creates the model, and fits it to X_train and y_train.
 
     Parameters
