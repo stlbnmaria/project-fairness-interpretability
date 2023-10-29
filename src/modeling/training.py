@@ -37,16 +37,16 @@ def get_model(
 def training(
     model_name: str = None, X_train: pd.DataFrame = None, y_train: pd.Series = None
 ) -> Union[RandomForestClassifier, LogisticRegression, DecisionTreeClassifier, LogisticGAM]:
-    """Given the name of the ML model we want, creats the model, and fits it to X_train and Y_train.
+    """Given the name of the ML model, creates the model, and fits it to X_train and y_train.
 
     Parameters
     ----------
     model_name: str
         Name of the model we want to create.
     X_train: pd.DataFrame
-        Pandas dataframe containing the training data without the target variable.
+        Dataframe containing the training data without the target variable.
     y_train: pd.Series
-        Pandas Series containing the values of the target variable for the training data.
+        Series containing the values of the target variable for the training data.
 
     Returns
     -------
