@@ -17,6 +17,19 @@ from config.config_data import (
     OUT_PATH,
 )
 
+# TODO: created nested dict for yaml with append; push dicts afterwards
+# TODO: check that hard code dict works bc of capitalization -> Other also still capitalised?
+# TODO: replace docstrings and take out nested function for replace_with_best_match
+# TODO: create docstrings for replace with hard -> also think about reverting the dict for
+#       readability see
+#       https://stackoverflow.com/questions/483666/reverse-invert-a-dictionary-mapping
+# TODO: include color and vehicle type in here by iterating over in config
+#       defined grouping cols
+# TODO: rename EDA notebook to group finding or something and create proper EDA notebook for
+#       actual EDA on processed data
+# TODO: think of how to sample the data - not more than 20k observations
+# TODO: do EDA with correlations plot, distributions, etc
+
 
 def load_data(path_: Path) -> Tuple[pd.DataFrame, MetaData]:
     """Loads the .arff file (incl. metadata) and converts to utf-8.
@@ -190,7 +203,6 @@ def clean_string(s: str) -> str:
     return s
 
 
-# TODO: replace docstrings and take out nested function
 def replace_with_best_match(
     df: pd.DataFrame,
     choices: dict,
@@ -242,7 +254,6 @@ def replace_with_best_match(
     return df
 
 
-# TODO: create docstrings
 def replace_with_hard(data: pd.DataFrame, dict_hard: dict, column: str = "Make") -> pd.DataFrame:
     data[column] = data[column].replace(dict_hard)
     return data
