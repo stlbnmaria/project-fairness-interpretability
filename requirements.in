@@ -3,6 +3,7 @@ scikit-learn==1.3.2
 
 # linting
 pre-commit==3.3.3
+pygam==0.9.0
 black==22.10.0
 black[jupyter]
 isort==5.12.0
