@@ -11,7 +11,6 @@ from sklearn.tree import DecisionTreeClassifier
 def inference(
     model: Union[RandomForestClassifier, LogisticRegression, DecisionTreeClassifier, LogisticGAM],
     X: pd.DataFrame,
-    predict_proba: bool = True,
 ) -> np.ndarray:
     """Given X and a model, returns an array containing the predictions.
 
@@ -21,16 +20,11 @@ def inference(
         Model which will be used to make the predictions.
     X: pd.DataFrame
         Data for which the model will predict the target variable label or probability.
-    predict_proba: bool
-        Boolean which represents whether the output should be the predicted labels or probabilities.
 
     Returns
     -------
     preds: np. ndarray
-        Array containing the predicted labels/probabilities.
+        Array containing the predicted probabilities.
     """
-    if predict_proba:
-        preds = model.predict_proba(X)
-    else:
-        preds = model.predict(X)
+    preds = model.predict_proba(X)
     return preds
