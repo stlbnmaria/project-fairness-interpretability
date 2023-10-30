@@ -30,7 +30,7 @@ def main(
     test_size: float,
     random_state: int,
     model_name: str,
-    params: dict[str, Union[float, int, bool]],
+    params: dict[str, Union[float, int, bool]],  # TODO: fix typing here
     threshold: float,
 ) -> None:
     # validate that mlflow runs locally
@@ -89,23 +89,15 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     for model_config in MODELS_TO_COMPARE:
-        run_name = model_config["RUN_NAME"]
-        model_name = model_config["MODEL_NAME"]
-        params = model_config["PARAMS"]
-
-        args.run_name = run_name
-        args.model_name = model_name
-        args.params = params
-
         main(
             data_path=args.data_path,
             experiment=args.experiment,
-            run_name=args.run_name,
+            run_name=model_config["RUN_NAME"],
             cat_cols=args.cat_cols,
             train_size=args.train_size,
             test_size=args.test_size,
             random_state=args.random_state,
-            model_name=args.model_name,
-            params=args.params,
+            model_name=model_config["MODEL_NAME"],
+            params=model_config["PARAMS"],
             threshold=args.threshold,
         )
