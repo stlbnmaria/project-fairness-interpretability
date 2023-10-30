@@ -91,11 +91,11 @@ if __name__ == "__main__":
     for model_config in MODELS_TO_COMPARE:
         run_name = model_config["RUN_NAME"]
         model_name = model_config["MODEL_NAME"]
-        papams = model_config["PARAMS"]
+        params = model_config["PARAMS"]
 
         args.run_name = run_name
         args.model_name = model_name
-        args.params = papams
+        args.params = params
 
         main(
             data_path=args.data_path,
