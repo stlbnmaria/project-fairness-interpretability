@@ -9,11 +9,10 @@ from inference import inference
 from training import training
 
 from config.config_data import OUT_PATH
-from config.config_modeling import (
+from config.config_modeling import (  # MODEL_NAME,; PARAMS,
     CAT_COLS,
     EXPERIMENT,
-    MODEL_NAME,
-    PARAMS,
+    MODELS_TO_COMPARE,
     RANDOM_STATE,
     RUN_NAME,
     TEST_FROM_VAL,
@@ -59,7 +58,8 @@ def main(
         # predictions and evalutation
         for state in ["train", "val", "test"]:
             preds_prob = inference(model=model, X=data[state][0])
-            preds = preds_prob[:, 1] > threshold
+            preds = preds_prob[:, 1] > threshold  # need to change depeding on the model
+            # specifically for GAM
             metrics = eval_metrics(data[state][1], preds, preds_prob)
             metrics = {state + "_" + k: v for k, v in metrics.items()}
             mlflow.log_metrics(metrics)
@@ -80,23 +80,30 @@ if __name__ == "__main__":
         "--test_size", default=TEST_FROM_VAL, help="Share of val-test data for test"
     )
     parser.add_argument("--random_state", default=RANDOM_STATE, help="Random state of data split")
-    parser.add_argument("--model_name", default=MODEL_NAME, help="Model name for training")
-    parser.add_argument("--params", default=PARAMS, help="Parameters for model")
+    # parser.add_argument("--model_name", default=MODEL_NAME, help="Model name for training")
+    # parser.add_argument("--params", default=PARAMS, help="Parameters for model")
     parser.add_argument(
         "--threshold", default=THRESHOLD, help="Threshold for probability predictions"
     )
 
     args = parser.parse_args()
 
-    main(
-        data_path=args.data_path,
-        experiment=args.experiment,
-        run_name=args.run_name,
-        cat_cols=args.cat_cols,
-        train_size=args.train_size,
-        test_size=args.test_size,
-        random_state=args.random_state,
-        model_name=args.model_name,
-        params=args.params,
-        threshold=args.threshold,
-    )
+    for model_config in MODELS_TO_COMPARE:
+        model_name = model_config["MODEL_NAME"]
+        papams = model_config["PARAMS"]
+
+        args.model_name = model_name
+        args.params = papams
+
+        main(
+            data_path=args.data_path,
+            experiment=args.experiment,
+            run_name=args.run_name,
+            cat_cols=args.cat_cols,
+            train_size=args.train_size,
+            test_size=args.test_size,
+            random_state=args.random_state,
+            model_name=args.model_name,
+            params=args.params,
+            threshold=args.threshold,
+        )
