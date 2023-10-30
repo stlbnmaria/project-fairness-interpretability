@@ -24,7 +24,7 @@ def auc_score(y: pd.Series, pred_probs: np.ndarray) -> float:
     AUC: float
         Area under the curve metric value.
     """
-    AUC = roc_auc_score(y, pred_probs[:, 1])
+    AUC = roc_auc_score(y, pred_probs)
     return AUC
 
 

@@ -43,4 +43,6 @@ def inference(
         Array containing the predicted probabilities.
     """
     preds = model.predict_proba(X)
+    if preds.shape[1] == 2:
+        preds = preds[:, 1]
     return preds
