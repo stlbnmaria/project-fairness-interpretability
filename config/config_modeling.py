@@ -29,8 +29,14 @@ MODELS_TO_COMPARE = [
             },
             {
                 "C": [0.8, 0.9, 1.0, 1.1],
-                "penalty": ["elasticnet", "l2", "l1"],
+                "penalty": ["l2", "l1"],
                 "solver": ["saga"],
+            },
+            {
+                "C": [0.8, 0.9, 1.0, 1.1],
+                "penalty": ["elasticnet"],
+                "solver": ["saga"],
+                "l1_ratio": [0.3, 0.5, 0.7],
             },
         ],
     },
@@ -41,7 +47,7 @@ MODELS_TO_COMPARE = [
             "max_depth": [5, 10, 15, 20],
             "min_samples_split": [10, 20, 30, 40, 50],
             "ccp_alpha": [0.0001, 0.005, 0.001],
-            "max_features": ["auto", "log2", "sqrt"],
+            "max_features": ["log2", "sqrt", 1],
         },
     },
     {
