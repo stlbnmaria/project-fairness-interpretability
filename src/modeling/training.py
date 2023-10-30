@@ -1,4 +1,4 @@
-from typing import Tuple, Union
+from typing import List, Union
 
 import pandas as pd
 from pygam import LogisticGAM
@@ -63,7 +63,7 @@ def training(
     model_name: str,
     X_train: pd.DataFrame,
     y_train: pd.Series,
-    params: dict[str, Union[str, float, int, bool, Tuple[int]]],
+    params: Union[List[dict], dict],
 ) -> Union[
     RandomForestClassifier,
     LogisticRegression,
@@ -82,7 +82,7 @@ def training(
         Dataframe containing the training data without the target variable.
     y_train: pd.Series
         Series containing the values of the target variable for the training data.
-    params: dict[str, Union[str, float, int, bool, Tuple[int]]]
+    params: Union[List[dict], dict]
         Parameters for model.
 
     Returns

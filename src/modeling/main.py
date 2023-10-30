@@ -1,6 +1,6 @@
 import argparse
 from pathlib import Path
-from typing import List, Tuple, Union
+from typing import List, Union
 
 import mlflow
 from create_data_split import split_data
@@ -30,7 +30,7 @@ def main(
     test_size: float,
     random_state: int,
     model_name: str,
-    params: dict[str, Union[str, float, int, bool, Tuple[int]]],
+    params: Union[List[dict], dict],
     threshold: float,
 ) -> None:
     # validate that mlflow runs locally
