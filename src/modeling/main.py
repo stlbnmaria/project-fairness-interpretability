@@ -1,6 +1,6 @@
 import argparse
 from pathlib import Path
-from typing import List, Union
+from typing import List, Tuple, Union
 
 import mlflow
 from create_data_split import split_data
@@ -29,7 +29,7 @@ def main(
     test_size: float,
     random_state: int,
     model_name: str,
-    params: dict[str, Union[float, int, bool]],  # TODO: fix typing here
+    params: dict[str, Union[float, int, bool, Tuple[int]]],
     threshold: float,
 ) -> None:
     # validate that mlflow runs locally
@@ -61,7 +61,6 @@ def main(
             metrics = eval_metrics(data[state][1], preds, preds_prob)
             metrics = {state + "_" + k: v for k, v in metrics.items()}
             mlflow.log_metrics(metrics)
-            print(metrics)
 
 
 if __name__ == "__main__":
