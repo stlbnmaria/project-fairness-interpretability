@@ -15,7 +15,6 @@ from config.config_modeling import (
     EXPERIMENT,
     MODELS_TO_COMPARE,
     RANDOM_STATE,
-    RUN_NAME,
     TEST_FROM_VAL,
     THRESHOLD,
     TRAIN_SIZE,
@@ -75,7 +74,6 @@ if __name__ == "__main__":
 
     parser.add_argument("--data_path", default=OUT_PATH, help="Path to data")
     parser.add_argument("--experiment", default=EXPERIMENT, help="Experiment name for Mlflow")
-    parser.add_argument("--run_name", default=RUN_NAME, help="Run name for MLflow")
     parser.add_argument(
         "--cat_cols", default=CAT_COLS, help="Categorical columns for dummy encoding"
     )
@@ -91,9 +89,11 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     for model_config in MODELS_TO_COMPARE:
+        run_name = model_config["RUN_NAME"]
         model_name = model_config["MODEL_NAME"]
         papams = model_config["PARAMS"]
 
+        args.run_name = run_name
         args.model_name = model_name
         args.params = papams
 
