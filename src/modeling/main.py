@@ -3,6 +3,7 @@ from pathlib import Path
 from typing import List, Union
 
 import mlflow
+import numpy as np
 from create_data_split import split_data
 from evaluation import eval_metrics
 from inference import inference
@@ -58,8 +59,11 @@ def main(
         # predictions and evalutation
         for state in ["train", "val", "test"]:
             preds_prob = inference(model=model, X=data[state][0])
-            preds = preds_prob[:, 1] > threshold  # need to change depeding on the model
-            # specifically for GAM
+            # for GAM predict_proba only returns a 1D array but we need 2 columns
+            if model_name == "GAM":
+                new_column = 1 - preds_prob
+                preds_prob = np.column_stack((new_column, preds_prob))
+            preds = preds_prob[:, 1] > threshold
             metrics = eval_metrics(data[state][1], preds, preds_prob)
             metrics = {state + "_" + k: v for k, v in metrics.items()}
             mlflow.log_metrics(metrics)
