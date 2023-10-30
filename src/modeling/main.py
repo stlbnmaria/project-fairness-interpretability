@@ -9,7 +9,7 @@ from inference import inference
 from training import training
 
 from config.config_data import OUT_PATH
-from config.config_modeling import (  # MODEL_NAME,; PARAMS,
+from config.config_modeling import (
     CAT_COLS,
     EXPERIMENT,
     MODELS_TO_COMPARE,
@@ -80,8 +80,6 @@ if __name__ == "__main__":
         "--test_size", default=TEST_FROM_VAL, help="Share of val-test data for test"
     )
     parser.add_argument("--random_state", default=RANDOM_STATE, help="Random state of data split")
-    # parser.add_argument("--model_name", default=MODEL_NAME, help="Model name for training")
-    # parser.add_argument("--params", default=PARAMS, help="Parameters for model")
     parser.add_argument(
         "--threshold", default=THRESHOLD, help="Threshold for probability predictions"
     )
