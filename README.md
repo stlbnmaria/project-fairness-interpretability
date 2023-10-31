@@ -34,7 +34,20 @@ python src/data_preprocessing/data_preprocessor.py
 ```
 
 ## Modeling
-The paramters can be changed in the `config/config_modeling.py`. Run the training with mlflow tracking with the following command:
+The paramters can be changed in the `config/config_modeling.py`. The data is seperated into 60% training and 20% validation and testing each by default.
+
+Run the training with mlflow tracking with the following command:
 ```bash
 python src/modeling/main.py
 ```
+
+### Results
+The model selection was performed on the validation data. Below the results are displayed for white and black box models.
+| Model                 | Train AUC | Val AUC | Test AUC | Test Accuracy | Test F1 Score |
+| --------------------- | --------- | ------- | -------- | ------------- | ------------- |
+| Logistic Regression   |           |         |          |               |               |
+| Decision Tree         |           |         |          |               |               |
+| GAM                   |           |         |          |               |               |
+| Random Froest         |           |         |          |               |               |
+| XGB                   |           |         |          |               |               |
+| ANN                   |           |         |          |               |               |
