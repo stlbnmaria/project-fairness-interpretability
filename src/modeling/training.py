@@ -8,8 +8,6 @@ from sklearn.neural_network import MLPClassifier
 from sklearn.tree import DecisionTreeClassifier
 from xgboost import XGBClassifier
 
-# TODO: ADD PLTR
-
 
 def get_model(
     model_name: str,
