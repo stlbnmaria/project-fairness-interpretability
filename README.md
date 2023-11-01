@@ -32,3 +32,22 @@ To run the data preprocessing and get a `data.csv` output for the following part
 ```bash
 python src/data_preprocessing/data_preprocessor.py
 ```
+
+## Modeling
+The paramters can be changed in the `config/config_modeling.py`. The data is seperated into 60% training and 20% validation and testing each by default.
+
+Run the training with mlflow tracking with the following command:
+```bash
+python src/modeling/main.py
+```
+
+### Results
+The model selection was performed on the validation data. Below the results are displayed for white and black box models.
+| Model                 | Train AUC | Val AUC  | Test AUC | Test Accuracy | Test F1 Score |
+| --------------------- | --------- | -------- | -------- | ------------- | ------------- |
+| **XGB**               | **0.663** | **0.635**| **0.623**| 0.585         | 0.515         |
+| Random Froest         | 0.644     | 0.632    | 0.621    | **0.587**     | 0.503         |
+| GAM                   | 0.617     | 0.626    | 0.613    | 0.583         | 0.510         |
+| Logistic Regression   | 0.617     | 0.625    | 0.612    | 0.583         | 0.508         |
+| ANN                   | 0.608     | 0.619    | 0.605    | 0.497         | **0.653**     |
+| Decision Tree         | 0.608     | 0.614    | 0.598    | 0.574         | 0.438         |
