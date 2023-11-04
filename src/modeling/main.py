@@ -3,13 +3,13 @@ from pathlib import Path
 from typing import List, Union
 
 import mlflow
-from create_data_split import split_data
+import pandas as pd
 from evaluation import eval_metrics
 from inference import inference
 from sklearn.model_selection import ParameterGrid
 from training import training
 
-from config.config_data import OUT_PATH
+from config.config_data import DATA_PATH
 from config.config_modeling import (
     CAT_COLS,
     EXPERIMENT,
@@ -27,10 +27,6 @@ def main(
     data_path: Path,
     experiment: str,
     run_name: str,
-    cat_cols: List,
-    train_size: float,
-    test_size: float,
-    random_state: int,
     model_name: str,
     params: Union[List[dict], dict],
     threshold: float,
@@ -58,28 +54,30 @@ def main(
 
         with mlflow.start_run(run_name=run_name):
             # dummy encoding and data split
-            data = split_data(
-                cols=cat_cols,
-                data_path=data_path,
-                train_size=train_size,
-                test_size=test_size,
-                random_state=random_state,
-            )
+
+            # load data from path
+            if data_path:
+                X_train = pd.read_csv(Path(data_path.parent / "train_X.csv"))
+                y_train = pd.read_csv(Path(data_path.parent / "train_Y.csv"))
 
             # training
             model = training(
                 model_name=model_name,
-                X_train=data["train"][0],
-                y_train=data["train"][1],
+                X_train=X_train,
+                y_train=y_train,
                 params=params,
             )
             mlflow.log_params(params)
 
             # predictions and evalutation
             for state in ["train", "val", "test"]:
-                preds_prob = inference(model=model, X=data[state][0])
+                if data_path:
+                    X_state = pd.read_csv(Path(data_path.parent / f"{state}_X.csv"))
+                    y_state = pd.read_csv(Path(data_path.parent / f"{state}_Y.csv"))
+
+                preds_prob = inference(model=model, X=X_state)
                 preds = preds_prob > threshold
-                metrics = eval_metrics(data[state][1], preds, preds_prob)
+                metrics = eval_metrics(y_state, preds, preds_prob)
                 metrics = {state + "_" + k: v for k, v in metrics.items()}
                 mlflow.log_metrics(metrics)
 
@@ -99,7 +97,7 @@ def main(
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
 
-    parser.add_argument("--data_path", default=OUT_PATH, help="Path to data")
+    parser.add_argument("--data_path", default=DATA_PATH, help="Path to data")
     parser.add_argument("--experiment", default=EXPERIMENT, help="Experiment name for Mlflow")
     parser.add_argument(
         "--cat_cols", default=CAT_COLS, help="Categorical columns for dummy encoding"
@@ -121,10 +119,6 @@ if __name__ == "__main__":
             data_path=args.data_path,
             experiment=args.experiment,
             run_name=model_config["RUN_NAME"],
-            cat_cols=args.cat_cols,
-            train_size=args.train_size,
-            test_size=args.test_size,
-            random_state=args.random_state,
             model_name=model_config["MODEL_NAME"],
             params=model_config["PARAMS"],
             threshold=args.threshold,

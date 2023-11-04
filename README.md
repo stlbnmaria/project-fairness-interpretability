@@ -30,7 +30,7 @@ Check out the jupyter notebooks to understand the data the preprocessing decisio
 
 To run the data preprocessing and get a `data.csv` output for the following parts, run:
 ```bash
-python src/data_preprocessing/data_preprocessor.py
+python src/data_preprocessing/main.py
 ```
 
 ## Modeling
