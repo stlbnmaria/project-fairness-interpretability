@@ -44,3 +44,37 @@ def save_pickle(
     """
     with open(path, "wb") as f:
         pickle.dump(obj, f)
+
+
+def load_pickle(
+    path: Path,
+) -> Union[
+    RandomForestClassifier,
+    LogisticRegression,
+    DecisionTreeClassifier,
+    LogisticGAM,
+    XGBClassifier,
+    MLPClassifier,
+]:
+    """Given a path, loads and returns the pickle file in the specified path.
+
+    Parameters
+    ----------
+    path : Path
+           Represents the path where the pickle object is stored.
+
+    Returns
+    -------
+    obj : Union[
+            RandomForestClassifier,
+            LogisticRegression,
+            DecisionTreeClassifier,
+            LogisticGAM,
+            XGBClassifier,
+            MLPClassifier,
+        ]
+          Represents the model that will be loaded.
+    """
+    with open(path, "rb") as f:
+        loaded_obj = pickle.load(f)
+    return loaded_obj
