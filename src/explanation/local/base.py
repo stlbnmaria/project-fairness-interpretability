@@ -21,5 +21,8 @@ class BaseLocalExplainer(ABC):
         """Get features global explanation.
 
         Must be implemented by all child classes.
+        :param x: Input data to be explained.
+        :param normalize: The flag, whether to normalize calculated global explanations.
+        :return: Dict with feature names and related global explanations.
         """
         raise NotImplementedError
