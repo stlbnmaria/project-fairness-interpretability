@@ -13,12 +13,14 @@ from config.config_data import OUT_PATH
 from config.config_modeling import (
     CAT_COLS,
     EXPERIMENT,
+    MODELS_PATH,
     MODELS_TO_COMPARE,
     RANDOM_STATE,
     TEST_FROM_VAL,
     THRESHOLD,
     TRAIN_SIZE,
 )
+from src.utils.models_pkl import save_pickle
 
 
 def main(
@@ -32,6 +34,7 @@ def main(
     model_name: str,
     params: Union[List[dict], dict],
     threshold: float,
+    models_path: Union[Path, None],
 ) -> None:
     # validate that mlflow runs locally
     print(f"tracking URI: '{mlflow.get_tracking_uri()}'")
@@ -79,6 +82,17 @@ def main(
                 metrics = eval_metrics(data[state][1], preds, preds_prob)
                 metrics = {state + "_" + k: v for k, v in metrics.items()}
                 mlflow.log_metrics(metrics)
+
+            if models_path:
+                # log model as artifact for mlflow
+                mlflow.sklearn.log_model(model, run_name.replace(" ", "_"))
+
+                # save model in models folder as well
+                # ATTENTION: this overwrites the old one pkl file for a model
+                models_path.mkdir(parents=True, exist_ok=True)
+                models_path = models_path / (model_name.replace(" ", "_") + ".pkl")
+                save_pickle(models_path, model)
+
         i += 1
 
 
@@ -98,6 +112,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--threshold", default=THRESHOLD, help="Threshold for probability predictions"
     )
+    parser.add_argument("--models_path", default=MODELS_PATH, help="Path for models to load from")
 
     args = parser.parse_args()
 
@@ -113,4 +128,5 @@ if __name__ == "__main__":
             model_name=model_config["MODEL_NAME"],
             params=model_config["PARAMS"],
             threshold=args.threshold,
+            models_path=args.models_path,
         )
