@@ -395,7 +395,7 @@ def create_n_topics(
     """
     # Create a CountVectorizer
     vectorizer = CountVectorizer(max_features=max_features, stop_words="english")
-    X = vectorizer.fit_transform(data[column_name])
+    X = vectorizer.fit_transform(df[column_name])
 
     # create an LDA model
     lda = LatentDirichletAllocation(n_components=n_topics, random_state=42)
@@ -500,7 +500,7 @@ def preprocessor(data_path: Path, n_topics: int, cols: List[str]) -> pd.DataFram
     data = preprocess_text(data)
 
     # extracts n new topics from descibe column
-    data = create_n_topics(data, n_topics)
+    data = create_n_topics(data, n_topics=n_topics)
 
     # drop unwished cols
     data = drop_cols(data, cols)
