@@ -1,13 +1,19 @@
 import datetime
 import re
+import string
 from pathlib import Path
 from typing import List, Tuple
 
+import nltk
 import pandas as pd
+import spacy
 import yaml
 from fuzzywuzzy import fuzz, process
+from nltk.corpus import stopwords
 from scipy.io.arff import loadarff
 from scipy.io.arff._arffread import MetaData
+from sklearn.decomposition import LatentDirichletAllocation
+from sklearn.feature_extraction.text import CountVectorizer
 
 from config.config_data import (
     DATA_PATH,
@@ -15,8 +21,12 @@ from config.config_data import (
     DICT_PATH,
     DROP_COLS,
     N_CATEGORIES,
+    N_TOPICS,
     OUT_PATH,
 )
+
+nltk.download("stopwords")
+nlp = spacy.load("en_core_web_sm")
 
 
 def load_data(path_: Path) -> Tuple[pd.DataFrame, MetaData]:
@@ -316,6 +326,90 @@ def categorize_top_n(df: pd.DataFrame, column_name: str, n: int = 10) -> pd.Data
     return df
 
 
+def preprocess_text(df: pd.DataFrame, column_name: str = "Description") -> pd.DataFrame:
+    """Reformats text so that LDA can be applied in the next step.
+
+    Parameters
+    -------
+    df : pd.DataFrame
+            Data to transform.
+    column_name : (str, optional)
+            Name of column to be transformed.
+            Defaults to "Description".
+
+    Returns
+    -------
+    df : pd.DataFrame
+            Transformed data.
+    """
+    # making text lower case
+    lowercase_text = df[column_name].apply(lambda x: x.lower())
+
+    # tokenize text
+    tokenized_text = lowercase_text.apply(lambda x: nltk.word_tokenize(x))
+
+    # removing stopwords
+    stop_words = set(stopwords.words("english"))
+    clean_text = tokenized_text.apply(
+        lambda tokens: [
+            word for word in tokens if word not in stop_words and word not in string.punctuation
+        ]
+    )
+
+    # lemmatize words
+    lemmatized_text = clean_text.apply(
+        lambda tokens: [token.lemma_ for token in nlp(" ".join(tokens))]
+    )
+
+    df["description_clean"] = lemmatized_text.apply(lambda lem_tokens: " ".join(lem_tokens))
+
+    return df
+
+
+def create_n_topics(
+    df: pd.DataFrame,
+    column_name: str = "description_clean",
+    n_topics: int = 10,
+    max_features: int = 1000,
+) -> pd.DataFrame:
+    """Applies LDA to a text column of DF and adds LDA topic distributions as new features.
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+        Data to transform.
+
+    column_name : str, optional
+        Name of the column to be transformed. Defaults to "Description".
+
+    num_topics : int, optional
+        Number of topics for LDA. Defaults to 10.
+
+    max_features : int, optional
+        Maximum number of features for CountVectorizer. Defaults to 1000.
+
+    Returns
+    -------
+    df : pd.DataFrame
+        Transformed data with added LDA topic features.
+    """
+    # Create a CountVectorizer
+    vectorizer = CountVectorizer(max_features=max_features, stop_words="english")
+    X = vectorizer.fit_transform(data[column_name])
+
+    # create an LDA model
+    lda = LatentDirichletAllocation(n_components=n_topics, random_state=42)
+
+    lda.fit(X)
+
+    topic_distributions = lda.transform(X)
+
+    for i in range(n_topics):
+        df[f"Topic_{i+1}"] = topic_distributions[:, i]
+
+    return df
+
+
 def drop_cols(df: pd.DataFrame, cols: List[str]) -> pd.DataFrame:
     """Drop columns from dataframe.
 
@@ -366,7 +460,7 @@ def filter_na(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def preprocessor(data_path: Path, cols: List[str]) -> pd.DataFrame:
+def preprocessor(data_path: Path, n_topics: int, cols: List[str]) -> pd.DataFrame:
     """Load data and perform preprocessing steps.
 
     Parameters
@@ -402,6 +496,12 @@ def preprocessor(data_path: Path, cols: List[str]) -> pd.DataFrame:
     # transform native american to other category and only keep top 4 explicit
     data = categorize_top_n(data, column_name="Race", n=4)
 
+    # transform describe column so that NLP can be applied
+    data = preprocess_text(data)
+
+    # extracts n new topics from descibe column
+    data = create_n_topics(data, n_topics)
+
     # drop unwished cols
     data = drop_cols(data, cols)
 
@@ -415,5 +515,5 @@ def preprocessor(data_path: Path, cols: List[str]) -> pd.DataFrame:
 
 
 if __name__ == "__main__":
-    data = preprocessor(DATA_PATH, DROP_COLS)
+    data = preprocessor(DATA_PATH, N_TOPICS, DROP_COLS)
     data.to_csv(OUT_PATH, index=False)
