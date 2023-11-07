@@ -1,12 +1,14 @@
+from typing import List, Union
+
 import matplotlib.pyplot as plt
-from typing import List, Union, Tuple
+import pandas as pd
 from pygam import LogisticGAM
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.tree import DecisionTreeClassifier
-import pandas as pd
 
-def get_underscore(cols : List) -> List[List]:
+
+def get_underscore(cols: List) -> List[List]:
     """Allows us to separate the columns which have an _ in their name.
 
     Parameters
@@ -25,13 +27,14 @@ def get_underscore(cols : List) -> List[List]:
     non_underscore_columns = []
     for col in cols:
         if "_" in col:
-            underscore_columns +=[col]
+            underscore_columns += [col]
         else:
-            non_underscore_columns +=[col]
+            non_underscore_columns += [col]
     return [underscore_columns, non_underscore_columns]
 
+
 def ohe_filter(non_underscore_cols: List, cols: List) -> List[List]:
-    """ Given columns with and without a _, returns a list of the columns which were and were not one hot encoded.
+    """Given columns with/without a _, returns list of columns which were/were not one hot encoded.
 
     Parameters
     ----------
@@ -63,10 +66,15 @@ def ohe_filter(non_underscore_cols: List, cols: List) -> List[List]:
             non_ohe += [value]
     return [non_ohe, ohe]
 
-def categorical_partial_dependence(model: Union[
-        RandomForestClassifier, LogisticRegression, DecisionTreeClassifier, LogisticGAM
-    ], X: pd.DataFrame, feature_names: List, figure_size: (int, int), y_label: str = "Partial Dependence"):
-    """Given a trained model, a dataframe and feature names, plots a matplotlib partial dependence plot.
+
+def categorical_partial_dependence(
+    model: Union[RandomForestClassifier, LogisticRegression, DecisionTreeClassifier, LogisticGAM],
+    X: pd.DataFrame,
+    feature_names: List,
+    figure_size: (int, int),
+    y_label: str = "Partial Dependence",
+) -> plt.show():
+    """Given a trained model, a dataframe and feature names, plots a partial dependence plot.
 
     Parameters
     ----------
@@ -76,12 +84,14 @@ def categorical_partial_dependence(model: Union[
         Dataframe for which we want the Partial Dependence plot.
     figure_size: Tuple(int)
         Size of the partial dependence plot.
-    y_label:
+    y_label: str
         Label of the y axis of the partial dependence plot.
 
     Returns
     -------
-    None
+    plt.show(): plt.figure
+        Partial dependence plot
+
     """
     average_preds = []
     for element in feature_names:
@@ -91,10 +101,10 @@ def categorical_partial_dependence(model: Union[
             if element != second_element:
                 X_copy[second_element] = 0
         probs = model.predict_proba(X_copy)
-        mean = probs[:,1].mean()
+        mean = probs[:, 1].mean()
         average_preds += [mean]
-    fig = plt.figure(figsize = figure_size)
+    plt.figure(figsize=figure_size)
     plt.bar(feature_names, average_preds)
     plt.ylabel(y_label)
     plt.xticks(rotation="vertical")
-    plt.show()
+    return plt.show()
