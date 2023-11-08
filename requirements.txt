@@ -1,3 +1,4 @@
+eli5==0.13.0
 fuzzywuzzy==0.18.0
 ipykernel==6.25.2
 Levenshtein==0.23.0
