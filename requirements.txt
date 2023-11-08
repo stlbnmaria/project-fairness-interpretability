@@ -10,7 +10,6 @@ scipy==1.11.3
 seaborn==0.13.0
 xgboost==2.0.1
 
-
 # linting
 pre-commit==3.3.3
 black==22.10.0
