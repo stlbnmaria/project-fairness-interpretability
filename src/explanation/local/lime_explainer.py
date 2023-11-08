@@ -1,3 +1,5 @@
+"""The LIME local explanation method implementation."""
+
 from collections import defaultdict
 
 import numpy as np
@@ -10,21 +12,35 @@ from src.explanation.local.base import BaseLocalExplainer
 
 
 class LimeExplainer(BaseLocalExplainer):
-    def __init__(self, prediction_function: object, dataset: pd.DataFrame) -> None:
-        """The Lime Explainer class.
+    """The Lime Explainer class.
 
-        Performs local model explanation using LIME approach.
-        :param prediction_function: The function, which accepts pd.DataFrame
+    Performs local model explanation using the LIME approach.
+    """
+
+    def __init__(self, prediction_function: object, dataset: pd.DataFrame) -> None:
+        """The constructor of the class.
+
+        Parameters
+        ----------
+        prediction_function : object
+            The function, which accepts pd.DataFrame
             and gives back np.ndarray with predictions.
-        :param dataset: The pd.DataFrame with training data to initialize LIME explainer.
+        dataset : pd.DataFrame
+            The training data to initialize the LIME explainer.
+
+        Returns
+        -------
+        Nothing.
         """
         super().__init__(prediction_function, dataset)
         self._explainer = self._init_explainer()
 
     def _init_explainer(self) -> LimeTabularExplainer:
-        """Init LIME Tabular Explainer.
+        """Init the LIME Tabular Explainer.
 
-        :return: LIME Tabular Explainer.
+        Returns
+        -------
+        LimeTabularExplainer.
         """
         explainer = LimeTabularExplainer(
             training_data=self.dataset.values,
@@ -36,8 +52,15 @@ class LimeExplainer(BaseLocalExplainer):
     def get_lime_explanation(self, x: pd.Series, **kwargs: dict) -> Explanation:
         """Get LIME explanation for the given data row.
 
-        :param x: Input data raw to be explained.
-        :return: LIME explanations.
+        Parameters
+        ----------
+        x : pd.Series
+            The input data raw to be explained.
+
+        Returns
+        -------
+        Explanation
+            The LIME explanations.
         """
         lime_explanation = self._explainer.explain_instance(
             data_row=x, predict_fn=self.prediction_function, num_features=len(x), **kwargs
@@ -49,9 +72,17 @@ class LimeExplainer(BaseLocalExplainer):
 
         Calculate mean absolute values of LIME values for each feature.
 
-        :param x: Input data to be explained.
-        :param normalize: The flag, whether to normalize calculated global explanations.
-        :return: Dict with feature names and related global explanations.
+        Parameters
+        ----------
+        x : pd.DataFrame
+            The input data to be explained.
+        normalize : bool
+            The flag, signifying if to normalize calculated global explanations.
+
+        Returns
+        -------
+        dict[str, float]
+            The dictionary with feature names and related global explanations.
         """
         global_explanation = defaultdict(list)
         for i in tqdm(range(len(x))):
