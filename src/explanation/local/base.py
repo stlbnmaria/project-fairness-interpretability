@@ -1,17 +1,31 @@
+"""The base class for the local explainers."""
+
 from abc import ABC, abstractmethod
 
 import pandas as pd
 
 
 class BaseLocalExplainer(ABC):
-    def __init__(self, prediction_function: object, dataset: pd.DataFrame) -> None:
-        """The base local explainer class.
+    """The base local explainer class.
 
-        All classes implementing local explanation approaches must inherit
-        from it.
-        :param prediction_function: The function, which accepts pd.DataFrame
-            and gives back np.ndarray with predictions.
-        :param dataset: The pd.DataFrame with the background data.
+    All classes implementing local explanation approaches must inherit
+    from it.
+    """
+
+    def __init__(self, prediction_function: object, dataset: pd.DataFrame) -> None:
+        """The constructor of the class.
+
+        Parameters
+        ----------
+        prediction_function : object
+            The function, which accepts pd.DataFrame and
+            gives back np.ndarray with predictions.
+        dataset : pd.DataFrame
+            The background data.
+
+        Returns
+        -------
+        Nothing.
         """
         self.prediction_function = prediction_function
         self.dataset = dataset
@@ -21,8 +35,16 @@ class BaseLocalExplainer(ABC):
         """Get features global explanation.
 
         Must be implemented by all child classes.
-        :param x: Input data to be explained.
-        :param normalize: The flag, whether to normalize calculated global explanations.
-        :return: Dict with feature names and related global explanations.
+        Parameters
+        ----------
+        x : pd.DataFrame
+            Input data to be explained.
+        normalize : bool
+            The flag, signifying if to normalize calculated global explanations.
+
+        Returns
+        -------
+        dict[str, float]
+            The dictionary with feature names and related global explanations.
         """
         raise NotImplementedError
