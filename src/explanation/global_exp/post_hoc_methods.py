@@ -110,7 +110,7 @@ def categorical_partial_dependence(
 
     Returns
     -------
-    plt.figure : plt.figure
+    fig : plt.figure
         Partial dependence plot.
 
     """
@@ -124,11 +124,11 @@ def categorical_partial_dependence(
         probs = model.predict_proba(X_copy)
         mean = probs[:, 1].mean()
         average_preds += [mean]
-    plt.figure(figsize=figure_size)
+    fig = plt.figure(figsize=figure_size)
     plt.bar(feature_names, average_preds)
     plt.ylabel(y_label)
     plt.xticks(rotation="vertical")
-    return plt.show()
+    return fig
 
 
 def ale_encoder(col: pd.Series) -> pd.DataFrame:
