@@ -1,4 +1,4 @@
-from typing import List, Union
+from typing import List, Tuple, Union
 
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -13,19 +13,19 @@ from xgboost import XGBClassifier
 from src.modeling.create_data_split import split_data
 
 
-def get_underscore(cols: List) -> List[List]:
+def get_underscore(cols: List[str]) -> Tuple[List[str]]:
     """Allows us to separate the columns which have an _ in their name.
 
     Parameters
     ----------
-    cols: list
+    cols: List[str]
         List of columns we want to separate.
 
     Returns
     -------
-    underscore_columns: list
+    underscore_columns: List[str]
         List of columns with a _.
-    non_underscore_columns: list
+    non_underscore_columns: List[str]
         List of columns without a _.
     """
     underscore_columns = []
@@ -35,24 +35,24 @@ def get_underscore(cols: List) -> List[List]:
             underscore_columns += [col]
         else:
             non_underscore_columns += [col]
-    return [underscore_columns, non_underscore_columns]
+    return underscore_columns, non_underscore_columns
 
 
-def ohe_filter(non_underscore_cols: List, cols: List) -> List[List]:
+def ohe_filter(non_underscore_cols: List[str], cols: List[str]) -> Tuple[List[str]]:
     """Given columns with/without a _, returns list of columns which were/were not one hot encoded.
 
     Parameters
     ----------
-    non_underscore_columns: list
+    non_underscore_columns: List[str]
         List of columns without a _.
-    underscore_columns: list
+    underscore_columns: List[str]
         List of columns with a _.
 
     Returns
     -------
-    non_ohe: list
+    non_ohe: List[str]
         List of columns which were not one hot encoded.
-    ohe: list
+    ohe: List[str]
         List of columns which were one hot encoded.
     """
     prefix_dict = dict()
@@ -64,12 +64,12 @@ def ohe_filter(non_underscore_cols: List, cols: List) -> List[List]:
             prefix_dict[prefix] = [col]
     non_ohe = [[col] for col in non_underscore_cols]
     ohe = []
-    for key, value in prefix_dict.items():
+    for _, value in prefix_dict.items():
         if len(value) > 1:
             ohe += [value]
         else:
             non_ohe += [value]
-    return [non_ohe, ohe]
+    return non_ohe, ohe
 
 
 def categorical_partial_dependence(
@@ -82,10 +82,10 @@ def categorical_partial_dependence(
         MLPClassifier,
     ],
     X: pd.DataFrame,
-    feature_names: List,
-    figure_size: (int, int),
+    feature_names: List[str],
+    figure_size: Tuple[int, int],
     y_label: str = "Partial Dependence",
-) -> plt.show():
+) -> plt.figure:
     """Given a trained model, a dataframe and feature names, plots a partial dependence plot.
 
     Parameters
@@ -101,14 +101,16 @@ def categorical_partial_dependence(
         Pre-trained model.
     X: pd.DataFrame
         Dataframe for which we want the Partial Dependence plot.
-    figure_size: Tuple(int)
+    feature_names: List[str]
+        List of features of a category.
+    figure_size: Tuple[int, int]
         Size of the partial dependence plot.
     y_label: str
         Label of the y axis of the partial dependence plot.
 
     Returns
     -------
-    plt.show(): plt.figure
+    plt.figure : plt.figure
         Partial dependence plot.
 
     """
@@ -148,8 +150,8 @@ def ale_encoder(col: pd.Series) -> pd.DataFrame:
 
 def ohe_ale(
     col: str,
-    cat_cols: List,
-    model_cols: List,
+    cat_cols: List[str],
+    model_cols: List[str],
     df: pd.DataFrame,
     model: Union[
         RandomForestClassifier,
@@ -169,9 +171,9 @@ def ohe_ale(
     ----------
     col: str
         Column for which we want to plot the ALE.
-    cat_cols : List
+    cat_cols : List[str]
         List of columns to be dummy encoded.
-    model_cols: List
+    model_cols: List[str]
         List of columns in the dataset used for training the model.
     df: pd.DataFrame
         Dataframe which will be split.
