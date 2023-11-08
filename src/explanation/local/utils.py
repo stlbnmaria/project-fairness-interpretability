@@ -4,7 +4,19 @@ import seaborn as sns
 
 
 def plot_bar(*args: list, **kwargs: dict) -> None:
-    """Plot the bar-plot with feature name vs feature importance value."""
+    """Plot the bar-plot with feature name vs feature importance value.
+
+    Parameters
+    ----------
+    *args : list
+        Non-keyword arguments.
+    *kwargs : dict
+        Keyword arguments.
+
+    Returns
+    -------
+    Nothing.
+    """
     sns.barplot(*args, **kwargs)
 
 
@@ -15,7 +27,25 @@ def plot_scatter(
     title: str = "",
     **kwargs: dict,
 ) -> None:
-    """Plot the scatter plot with feature values vs related feature importance values."""
+    """Plot the scatter plot with feature values vs related feature importance values.
+
+    Parameters
+    ----------
+    feature_values : array_like
+        Feature values.
+    feature_importance_values : array_like
+        Feature importance values.
+    feature_name : str
+        The name of a feature.
+    title : str
+        The title of the diagram.
+    **kwargs : dict
+        Keyword arguments.
+
+    Returns
+    -------
+    Nothing.
+    """
     ax = sns.scatterplot(x=feature_values, y=feature_importance_values, **kwargs)
 
     if feature_name is not None:
