@@ -4,16 +4,16 @@ import string
 from pathlib import Path
 from typing import List, Tuple
 
+import gensim
 import nltk
 import pandas as pd
 import spacy
 import yaml
 from fuzzywuzzy import fuzz, process
+from gensim import corpora
 from nltk.corpus import stopwords
 from scipy.io.arff import loadarff
 from scipy.io.arff._arffread import MetaData
-from sklearn.decomposition import LatentDirichletAllocation
-from sklearn.feature_extraction.text import CountVectorizer
 
 from config.config_data import (
     DATA_PATH,
@@ -370,7 +370,6 @@ def create_n_topics(
     df: pd.DataFrame,
     column_name: str = "description_clean",
     n_topics: int = 10,
-    max_features: int = 1000,
 ) -> pd.DataFrame:
     """Applies LDA to a text column of DF and adds LDA topic distributions as new features.
 
@@ -380,32 +379,37 @@ def create_n_topics(
         Data to transform.
 
     column_name : str, optional
-        Name of the column to be transformed. Defaults to "Description".
+        Name of the column to be transformed. Defaults to "description_clean".
 
     num_topics : int, optional
         Number of topics for LDA. Defaults to 10.
-
-    max_features : int, optional
-        Maximum number of features for CountVectorizer. Defaults to 1000.
 
     Returns
     -------
     df : pd.DataFrame
         Transformed data with added LDA topic features.
     """
-    # Create a CountVectorizer
-    vectorizer = CountVectorizer(max_features=max_features, stop_words="english")
-    X = vectorizer.fit_transform(df[column_name])
+    # Preprocess text
+    df = preprocess_text(df, column_name)
 
-    # create an LDA model
-    lda = LatentDirichletAllocation(n_components=n_topics, random_state=42)
+    # Tokenized text is already available from preprocessing but needs to be list of list
+    tokenized_text = df[column_name].str.split()
 
-    lda.fit(X)
+    # Create a Gensim dictionary and corpus
+    dictionary = corpora.Dictionary(tokenized_text)
+    corpus = [dictionary.doc2bow(text) for text in tokenized_text]
 
-    topic_distributions = lda.transform(X)
+    # Train an LDA model
+    lda_model = gensim.models.LdaModel(
+        corpus=corpus, id2word=dictionary, num_topics=n_topics, passes=10
+    )
 
+    # Extract LDA topics
+    topics = lda_model[corpus]
+
+    # Add LDA topic distributions as new features
     for i in range(n_topics):
-        df[f"Topic_{i+1}"] = topic_distributions[:, i]
+        df[f"Topic_{i+1}"] = [topic[i][1] if i < len(topic) else 0 for topic in topics]
 
     return df
 
