@@ -6,13 +6,25 @@ from src.explanation.local.base import BaseLocalExplainer
 
 
 class ShapExplainer(BaseLocalExplainer):
-    def __init__(self, prediction_function: object, dataset: pd.DataFrame) -> None:
-        """The SHAP Explainer class.
+    """The SHAP Explainer class.
 
-        Performs local model explanation using SHapley Additive exPLanations.
-        :param prediction_function: The function, which accepts pd.DataFrame
+    Performs local model explanation using SHapley Additive exPLanations.
+    """
+
+    def __init__(self, prediction_function: object, dataset: pd.DataFrame) -> None:
+        """The constructor of the class.
+
+        Parameters
+        ----------
+        prediction_function : object
+            The function, which accepts pd.DataFrame
             and gives back np.ndarray with predictions.
-        :param dataset: The pd.DataFrame with the background data.
+        dataset : pd.DataFrame
+            The background data.
+
+        Returns
+        -------
+        Nothing.
         """
         super().__init__(prediction_function, dataset)
         self._explainer = self._init_explainer()
@@ -21,7 +33,11 @@ class ShapExplainer(BaseLocalExplainer):
         """Calculate background sample.
 
         This sample features are used to emulate missing values for the Kernel Explainer.
-        :return: Background sample as a pd.DataFrame.
+
+        Returns
+        ----------
+        pd.DataFrame
+            Background sample.
         """
         numerical_features = self.dataset.select_dtypes(float).columns
 
@@ -37,7 +53,10 @@ class ShapExplainer(BaseLocalExplainer):
     def _init_explainer(self) -> KernelExplainer:
         """Init Kernel Explainer.
 
-        :return: Shap Kernel Explainer.
+        Returns
+        -------
+        KernelExplainer
+            Shap Kernel Explainer.
         """
         explainer = KernelExplainer(
             model=self.prediction_function,
@@ -50,8 +69,15 @@ class ShapExplainer(BaseLocalExplainer):
     def get_shap_explanation(self, x: pd.DataFrame) -> Explanation:
         """Get shap explanations for the given data.
 
-        :param x: Input data to be explained.
-        :return: Shap explanations.
+        Parameters
+        ----------
+        x : pd.DataFrame
+            Input data to be explained.
+
+        Returns
+        -------
+        Explanation
+            Shap explanations.
         """
         return self._explainer(x)
 
@@ -59,10 +85,17 @@ class ShapExplainer(BaseLocalExplainer):
         """Get global shap explanations.
 
         Calculate mean absolute values of shap values for each feature.
+        Parameters
+        ----------
+        x : pd.DataFrame
+            Input data to be explained.
+        normalize : bool
+            The flag, whether to normalize calculated global explanations.
 
-        :param x: Input data to be explained.
-        :param normalize: The flag, whether to normalize calculated global explanations.
-        :return: Dict with feature names and related global explanations.
+        Returns
+        -------
+        dict[str, float]
+            The dictionary with feature names and related global explanations.
         """
         shap_explanation = self.get_shap_explanation(x)
 
