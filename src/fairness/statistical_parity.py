@@ -1,3 +1,8 @@
+"""The implementation of the (conditional) statistical parity test.
+
+The model fairness is tested using the Standard Pearson chi-squared independence test.
+"""
+
 from dataclasses import dataclass
 
 import numpy as np
@@ -7,7 +12,21 @@ from scipy import stats
 
 @dataclass
 class TestResult:
-    """Representation of the chi^2 test result."""
+    """The representation of the chi-squared test result.
+
+    Parameters
+    ----------
+    passed : bool
+        The flag, signifying if the statistical test has passed.
+    statistic_value : float
+        The value of a calculated statistic.
+    quantile_value : float
+        The value of a distribution's quantile.
+    quantile_number: float
+        The number of the quantile.
+    degrees_of_freedom: int
+        The number of distribution's degrees of freedom.
+    """
 
     passed: bool
     statistic_value: float
@@ -16,7 +35,13 @@ class TestResult:
     degrees_of_freedom: int
 
     def __str__(self) -> str:
-        """Test result representation."""
+        """Test result representation.
+
+        Returns
+        -------
+        str
+            The test result summary.
+        """
         return (
             f"The chi^2 fairness test of statistical parity.\n"
             f"The null hypothesis - the prediction and the sensitive attribute are independent.\n"
@@ -31,13 +56,23 @@ class TestResult:
 
 
 def _get_group_value(n_outcome_group: int, n_outcome: int, n_group: int, n_total: int) -> float:
-    """Calculate the term of the chi^2 statistic for the given group.
+    """Calculate the term of the chi-squared statistic for the given group.
 
-    :param n_outcome_group: The number of records with the 'group' and 'outcome' values.
-    :param n_outcome: The number of records with the 'outcome' values.
-    :param n_group: The number of records with the 'group' values.
-    :param n_total: The total size of a sub-/population.
-    :return: The term for the given group.
+    Parameters
+    ----------
+    n_outcome_group : int
+        The number of records with the 'group' and 'outcome' values.
+    n_outcome : int
+        The number of records with the 'outcome' values.
+    n_group : int
+        The number of records with the 'group' values.
+    n_total : int
+        The total size of a subpopulation.
+
+    Returns
+    -------
+    float
+        The term for the given group.
     """
     expectation = n_group * n_outcome / n_total
     res = (n_outcome_group - expectation) ** 2 / expectation
@@ -50,13 +85,22 @@ def _get_chi2_statistic(
     attribute_values: np.ndarray | pd.Series,
     protected_group: str,
 ) -> float:
-    """Calculate the chi^2 statistic value.
+    """Calculate the chi-squared statistic value.
 
-    :param predictions: The list of predicted outcomes.
-    :param positive_outcome: The value of the positive outcome.
-    :param attribute_values: The list of sensitive attribute's values.
-    :param protected_group: The protected value of a sensitive attribute.
-    :return: The chi^2 statistic value.
+    Parameters
+    ----------
+    predictions : array_like
+        The list of predicted outcomes.
+    positive_outcome : str
+        The value of the positive outcome.
+    attribute_values : array_like
+        The list of sensitive attribute's values.
+    protected_group : The protected value of a sensitive attribute.
+
+    Returns
+    -------
+    float
+        The chi-squared statistic value.
     """
     # Population size.
     n_total = len(attribute_values)
@@ -101,15 +145,27 @@ def statistical_parity_test(
     """Perform statistical parity test.
 
     If multiple datasets are passed the "conditional" statistical parity test is performed.
-    :param dataset_list: The list of population subgroups. Single element list is considered as
+    Parameters
+    ----------
+    dataset_list : array_like
+        The list of population subgroups. Single element list is considered as
         a whole population. Each dataset must contain 'target' (ground truth or prediction) column.
-    :param sensitive_attribute: The attribute which is tested for a model's fairness.
+    sensitive_attribute : str
+        The attribute which is tested for a model's fairness.
         F.e. the 'sex' or the 'race'.
-    :param protected_group: The sensitive attribute's protected value.
-    :param target_column: The target column.
-    :param positive_outcome: The positive outcome value.
-    :param p_quantile: The p quantile of the chi^2 distribution.
-    :return: The 'TestResult' object encapsulating all information about
+    protected_group : str
+        The sensitive attribute's protected value.
+    target_column : str
+        The target column.
+    positive_outcome : str
+        The positive outcome value.
+    p_quantile : float
+        The p quantile of the chi-squared distribution.
+
+    Returns
+    -------
+    float
+        The 'TestResult' object encapsulating all information about
         the statistical parity test performed.
     """
     # Calculate test statistic.
