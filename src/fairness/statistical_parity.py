@@ -168,14 +168,14 @@ def statistical_parity_test(
         The 'TestResult' object encapsulating all information about
         the statistical parity test performed.
     """
-    # Calculate test statistic.
+    # Calculate a test statistic.
     chi2_statistic = 0
     for dataset in dataset_list:
         chi2_statistic += _get_chi2_statistic(
             dataset[target_column], positive_outcome, dataset[sensitive_attribute], protected_group
         )
 
-    # Calculate threshold value.
+    # Calculate a threshold value.
     degrees_of_freedom = len(dataset_list)
     quantile_value = stats.chi2.ppf(p_quantile, degrees_of_freedom)
 
