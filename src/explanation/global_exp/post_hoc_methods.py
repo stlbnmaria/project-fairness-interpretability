@@ -28,8 +28,10 @@ def get_underscore(cols: List[str]) -> Tuple[List[str]]:
     non_underscore_columns: List[str]
         List of columns without a _.
     """
+    # initializing lists of columns with and without _
     underscore_columns = []
     non_underscore_columns = []
+    # checking for each column if they have a _ and assigning them to their respective list
     for col in cols:
         if "_" in col:
             underscore_columns += [col]
@@ -54,22 +56,31 @@ def ohe_filter(non_underscore_cols: List[str], cols: List[str]) -> Tuple[List[st
         List of columns which were not one hot encoded.
     ohe: List[str]
         List of columns which were one hot encoded.
+    prefix_ohe: List[str]
+        List of prefixes of one hot encoded columns.
     """
+    # starting a dict with as keys the prefixes and as values the columns with those prefixes.
     prefix_dict = dict()
+    # finding the prefixes for each column and adding them to the dictionary.
     for col in cols:
         prefix = col.split("_")[0]
         if prefix in prefix_dict:
             prefix_dict[prefix] += [col]
         else:
             prefix_dict[prefix] = [col]
+    # adding all columns without underscore to non_ohe columns list.
     non_ohe = [[col] for col in non_underscore_cols]
     ohe = []
-    for _, value in prefix_dict.items():
+    prefix_ohe = []
+    # checking for each prefix if there is more than one column
+    # if so, OHE happened and so we assign them to the ohe list, and the prefix to the prefix list.
+    for key, value in prefix_dict.items():
         if len(value) > 1:
             ohe += [value]
+            prefix_ohe += [key]
         else:
             non_ohe += [value]
-    return non_ohe, ohe
+    return non_ohe, ohe, prefix_ohe
 
 
 def categorical_partial_dependence(
@@ -114,7 +125,10 @@ def categorical_partial_dependence(
         Partial dependence plot.
 
     """
+    # initializing list of predictions for the PDP plot.
     average_preds = []
+    # for each one hot encoded variable, compute the mean prediction
+    #  as if all data points belonged to that class and adding it to the average preds.
     for element in feature_names:
         X_copy = X.copy()
         X_copy[element] = 1
@@ -124,6 +138,7 @@ def categorical_partial_dependence(
         probs = model.predict_proba(X_copy)
         mean = probs[:, 1].mean()
         average_preds += [mean]
+    # creating the plot.
     fig = plt.figure(figsize=figure_size)
     plt.bar(feature_names, average_preds)
     plt.ylabel(y_label)
@@ -144,6 +159,7 @@ def ale_encoder(col: pd.Series) -> pd.DataFrame:
     feat_coded: pd.DataFrame
         Dataframe of the one hot encoded columns.
     """
+    # Given the panda series, encoding it to obtain a dataframe.
     feat_coded = pd.get_dummies(col, dtype=int)
     return feat_coded
 
@@ -163,6 +179,7 @@ def ohe_ale(
     ],
     train_size: float,
     test_size: float,
+    figure_size: Tuple[int, int],
     random_state: int = 42,
 ) -> plt.figure:
     """Function which allows us to plot the ALE for one hot encoded variables.
@@ -171,7 +188,7 @@ def ohe_ale(
     ----------
     col: str
         Column for which we want to plot the ALE.
-    cat_cols : List[str]
+    cat_cols: List[str]
         List of columns to be dummy encoded.
     model_cols: List[str]
         List of columns in the dataset used for training the model.
@@ -186,11 +203,13 @@ def ohe_ale(
             MLPClassifier,
         ]
         Model used for the ALE plot.
-    train_size : float
+    train_size: float
         Percentage of whole data used for training.
-    test_size : float
+    test_size: float
         Percentage for testing from val-test data.
-    random_state : int
+    figure_size: Tuple[int, int]
+        Size of the plot we want to create.
+    random_state: int
         Random state of split for reproducibility.
 
     Returns
@@ -198,11 +217,17 @@ def ohe_ale(
     ale_eff: plt.figure
         ALE plot.
     """
+    # Finding the columns to be encoded first(we remove the column
+    #  we want to plot due to package restrictions).
     cols_ohe = cat_cols.copy()
     cols_ohe.remove(col)
+    # creating the dataset with the one hot encoding done(with the column
+    #  we want to plot not one hot encoded).
     step_data = split_data(
         cols_ohe, df=df, train_size=train_size, test_size=test_size, random_state=random_state
     )
+    # creating the ALE plot
+    fig, ax = plt.subplots(figsize=figure_size)
     ale_eff = ale(
         X=step_data["test"][0],
         model=model,
@@ -210,5 +235,7 @@ def ohe_ale(
         include_CI=False,
         encode_fun=ale_encoder,
         predictors=model_cols,
+        fig=fig,
+        ax=ax,
     )
     return ale_eff
