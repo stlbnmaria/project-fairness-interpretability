@@ -22,7 +22,9 @@ from config.config_data import (
     DROP_COLS,
     N_CATEGORIES,
     N_TOPICS,
+    NLP_FEATURE_COLS,
     OUT_PATH,
+    THRESHOLD,
 )
 
 nltk.download("stopwords")
@@ -377,10 +379,8 @@ def create_n_topics(
     ----------
     df : pd.DataFrame
         Data to transform.
-
     column_name : str, optional
         Name of the column to be transformed. Defaults to "description_clean".
-
     num_topics : int, optional
         Number of topics for LDA. Defaults to 10.
 
@@ -412,6 +412,30 @@ def create_n_topics(
         df[f"Topic_{i+1}"] = [topic[i][1] if i < len(topic) else 0 for topic in topics]
 
     return df
+
+
+def threshold_transform(data_frame: pd.DataFrame, t: float, columns: list[str]) -> pd.DataFrame:
+    """Transform specified columns in a DataFrame based on a threshold 't'.
+
+    Parameters
+    -------
+        data_frame : pd.DataFrame
+            The DataFrame to be transformed.
+        t : float
+            The threshold value.
+        columns_to_transform : list
+            List of column names to be transformed.
+
+    Returns
+    -------
+        pandas.DataFrame: A new DataFrame with specified columns transformed.
+    """
+    transformed_df = data_frame.copy()
+
+    for column in columns:
+        transformed_df[column] = (transformed_df[column] >= t).astype(int)
+
+    return transformed_df
 
 
 def drop_cols(df: pd.DataFrame, cols: List[str]) -> pd.DataFrame:
@@ -464,13 +488,21 @@ def filter_na(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def preprocessor(data_path: Path, n_topics: int, cols: List[str]) -> pd.DataFrame:
+def preprocessor(
+    data_path: Path, n_topics: int, t: float, feat_cols: List[str], cols: List[str]
+) -> pd.DataFrame:
     """Load data and perform preprocessing steps.
 
     Parameters
     -------
     path_ : Path
             Path of the data.
+    n_topics : int
+            Number of topics to create.
+    t : float
+            The thresold used to convert the float to int.
+    feat_cols : List[str]
+            The list of topic features that should be converted to int
     cols : List
             List of columns to drop.
 
@@ -506,6 +538,9 @@ def preprocessor(data_path: Path, n_topics: int, cols: List[str]) -> pd.DataFram
     # extracts n new topics from descibe column
     data = create_n_topics(data, n_topics=n_topics)
 
+    # transforming floats of topics extracted to int
+    data = threshold_transform(data, t, feat_cols)
+
     # drop unwished cols
     data = drop_cols(data, cols)
 
@@ -519,5 +554,5 @@ def preprocessor(data_path: Path, n_topics: int, cols: List[str]) -> pd.DataFram
 
 
 if __name__ == "__main__":
-    data = preprocessor(DATA_PATH, N_TOPICS, DROP_COLS)
+    data = preprocessor(DATA_PATH, N_TOPICS, THRESHOLD, NLP_FEATURE_COLS, DROP_COLS)
     data.to_csv(OUT_PATH, index=False)
