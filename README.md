@@ -30,7 +30,7 @@ Check out the jupyter notebooks to understand the data the preprocessing decisio
 
 To run the data preprocessing and get a `data.csv` output for the following parts, run:
 ```bash
-python src/data_preprocessing/main.py
+python src/data_preprocessing/data_preprocessor.py
 ```
 
 ## Modeling
@@ -38,7 +38,7 @@ The paramters can be changed in the `config/config_modeling.py`. The data is sep
 
 Run the training with mlflow tracking with the following command:
 ```bash
-python src/modeling/data_preprocessor.py
+python src/modeling/main.py
 ```
 
 ### Results
