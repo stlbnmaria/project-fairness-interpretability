@@ -1,11 +1,17 @@
 import datetime
 import re
+import string
 from pathlib import Path
 from typing import List, Tuple
 
+import gensim
+import nltk
 import pandas as pd
+import spacy
 import yaml
 from fuzzywuzzy import fuzz, process
+from gensim import corpora
+from nltk.corpus import stopwords
 from scipy.io.arff import loadarff
 from scipy.io.arff._arffread import MetaData
 
@@ -15,8 +21,14 @@ from config.config_data import (
     DICT_PATH,
     DROP_COLS,
     N_CATEGORIES,
+    N_TOPICS,
+    NLP_FEATURE_COLS,
     OUT_PATH,
+    THRESHOLD,
 )
+
+nltk.download("stopwords")
+nlp = spacy.load("en_core_web_sm")
 
 
 def load_data(path_: Path) -> Tuple[pd.DataFrame, MetaData]:
@@ -316,6 +328,124 @@ def categorize_top_n(df: pd.DataFrame, column_name: str, n: int = 10) -> pd.Data
     return df
 
 
+def preprocess_text(df: pd.DataFrame, column_name: str = "Description") -> pd.DataFrame:
+    """Reformats text so that LDA can be applied in the next step.
+
+    Parameters
+    -------
+    df : pd.DataFrame
+            Data to transform.
+    column_name : (str, optional)
+            Name of column to be transformed.
+            Defaults to "Description".
+
+    Returns
+    -------
+    df : pd.DataFrame
+            Transformed data.
+    """
+    # making text lower case
+    lowercase_text = df[column_name].apply(lambda x: x.lower())
+
+    # tokenize text
+    tokenized_text = lowercase_text.apply(lambda x: nltk.word_tokenize(x))
+
+    # removing stopwords
+    stop_words = set(stopwords.words("english"))
+    clean_text = tokenized_text.apply(
+        lambda tokens: [
+            word for word in tokens if word not in stop_words and word not in string.punctuation
+        ]
+    )
+
+    # lemmatize words
+    lemmatized_text = clean_text.apply(
+        lambda tokens: [token.lemma_ for token in nlp(" ".join(tokens))]
+    )
+
+    df["description_clean"] = lemmatized_text.apply(lambda lem_tokens: " ".join(lem_tokens))
+
+    return df
+
+
+def create_n_topics(
+    df: pd.DataFrame,
+    columns: list[str],
+    column_name: str = "description_clean",
+    n_topics: int = 10,
+    random_state: int = 42,
+) -> pd.DataFrame:
+    """Applies LDA to a text column of DF and adds LDA topic distributions as new features.
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+        Data to transform.
+    columns_to_transform : list
+        List of column names to be transformed.
+    column_name : str, optional
+        Name of the column to be transformed. Defaults to "description_clean".
+    num_topics : int, optional
+        Number of topics for LDA. Defaults to 10.
+    random_stat : int
+            Random state of split for reproducibility.
+
+    Returns
+    -------
+    df : pd.DataFrame
+        Transformed data with added LDA topic features.
+    """
+    # Preprocess text
+    df = preprocess_text(df, column_name)
+
+    # Tokenized text is already available from preprocessing but needs to be list of list
+    tokenized_text = df[column_name].str.split()
+
+    # Create a Gensim dictionary and corpus
+    dictionary = corpora.Dictionary(tokenized_text)
+    corpus = [dictionary.doc2bow(text) for text in tokenized_text]
+
+    # Train an LDA model
+    lda_model = gensim.models.LdaModel(
+        corpus=corpus, id2word=dictionary, num_topics=n_topics, passes=10, random_state=random_state
+    )
+
+    # Extract LDA topics
+    topics = lda_model[corpus]
+
+    # Add LDA topic distributions as new features
+    for i in range(n_topics):
+        df[f"Topic_{i+1}"] = [topic[i][1] if i < len(topic) else 0 for topic in topics]
+
+    df.columns = df.columns[:-n_topics].to_list() + columns
+
+    return df
+
+
+def threshold_transform(data_frame: pd.DataFrame, t: float, columns: list[str]) -> pd.DataFrame:
+    """Transform specified columns in a DataFrame based on a threshold 't'.
+
+    Parameters
+    -------
+        data_frame : pd.DataFrame
+            The DataFrame to be transformed.
+        t : float
+            The threshold value.
+        columns_to_transform : list
+            List of column names to be transformed.
+
+    Returns
+    -------
+        pandas.DataFrame: A new DataFrame with specified columns transformed.
+    """
+    transformed_df = data_frame.copy()
+
+    for column in columns:
+        transformed_df[column] = (transformed_df[column] >= t).astype(int)
+
+    return transformed_df
+
+
 def drop_cols(df: pd.DataFrame, cols: List[str]) -> pd.DataFrame:
     """Drop columns from dataframe.
 
@@ -366,13 +496,21 @@ def filter_na(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def preprocessor(data_path: Path, cols: List[str]) -> pd.DataFrame:
+def preprocessor(
+    data_path: Path, n_topics: int, t: float, feat_cols: List[str], cols: List[str]
+) -> pd.DataFrame:
     """Load data and perform preprocessing steps.
 
     Parameters
     -------
     path_ : Path
             Path of the data.
+    n_topics : int
+            Number of topics to create.
+    t : float
+            The thresold used to convert the float to int.
+    feat_cols : List[str]
+            The list of topic features that should be converted to int
     cols : List
             List of columns to drop.
 
@@ -402,6 +540,17 @@ def preprocessor(data_path: Path, cols: List[str]) -> pd.DataFrame:
     # transform native american to other category and only keep top 4 explicit
     data = categorize_top_n(data, column_name="Race", n=4)
 
+    # transform describe column so that NLP can be applied
+    data = preprocess_text(data)
+
+    # extracts n new topics from descibe column
+    if feat_cols:
+        data = create_n_topics(data, n_topics=n_topics, columns=feat_cols)
+
+    # transforming floats of topics extracted to int
+    if t:
+        data = threshold_transform(data, t, feat_cols)
+
     # drop unwished cols
     data = drop_cols(data, cols)
 
@@ -415,5 +564,5 @@ def preprocessor(data_path: Path, cols: List[str]) -> pd.DataFrame:
 
 
 if __name__ == "__main__":
-    data = preprocessor(DATA_PATH, DROP_COLS)
+    data = preprocessor(DATA_PATH, N_TOPICS, THRESHOLD, NLP_FEATURE_COLS, DROP_COLS)
     data.to_csv(OUT_PATH, index=False)
