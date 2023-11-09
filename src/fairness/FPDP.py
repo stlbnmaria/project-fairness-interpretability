@@ -186,7 +186,8 @@ def fairness_pdp_ohe(
                 X_copy[second_element] = 0
         preds = model.predict(X_copy)
         chi2 = get_chi2_statistic(preds, 1, sensitive_values, protected_group)
-        p_value = stats.chi2.sf(chi2, 1)
+        d_fred = len(sensitive_values.unique().tolist()) - 1
+        p_value = stats.chi2.sf(chi2, d_fred)
         p_values += [p_value]
     # creating the plot.
     fig = plt.figure(figsize=fig_size)
@@ -253,7 +254,7 @@ def fairness_pdp_cat(
     # intializing the p values list
     p_values = []
     # obtaining a list of all the different categories.
-    unique_vals = X[feature].unique().tolist()
+    unique_vals = np.sort(X[feature].unique().tolist())
     # for each of the categories, compute the p-value of the chi2 statistic obtained
     #  when the predictions where done on X_test setting the value of the categorical variable
     #  to the category.
@@ -262,11 +263,13 @@ def fairness_pdp_cat(
         X_copy[feature] = element
         preds = model.predict(X_copy)
         chi2 = get_chi2_statistic(preds, 1, sensitive_values, protected_group)
-        p_value = stats.chi2.sf(chi2, 1)
+        d_fred = len(sensitive_values.unique().tolist()) - 1
+        p_value = stats.chi2.sf(chi2, d_fred)
         p_values += [p_value]
     # creating the plot.
     fig = plt.figure(figsize=fig_size)
-    plt.bar(unique_vals, p_values)
+    unique_vals_plot = [str(x) for x in unique_vals]
+    plt.bar(unique_vals_plot, p_values)
     plt.axhline(y=p_value_threshold, color="r", linestyle="-")
     plt.ylabel(y_label)
     plt.xlabel(x_label)
@@ -339,7 +342,8 @@ def fairness_pdp_num(
         X_copy[feature] = i
         preds = model.predict(X_copy)
         chi2 = get_chi2_statistic(preds, 1, sensitive_values, protected_group)
-        p_value = stats.chi2.sf(chi2, 1)
+        d_fred = len(sensitive_values.unique().tolist()) - 1
+        p_value = stats.chi2.sf(chi2, d_fred)
         p_values += [p_value]
         i_vals += [i]
         i += step
