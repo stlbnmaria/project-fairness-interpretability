@@ -30,6 +30,7 @@ Check out the jupyter notebooks to understand the data the preprocessing decisio
 
 To run the data preprocessing and get a `data.csv` output for the following parts, run:
 ```bash
+python -m spacy download en_core_web_sm
 python src/data_preprocessing/data_preprocessor.py
 ```
 
