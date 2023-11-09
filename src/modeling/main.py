@@ -45,7 +45,7 @@ def main(
     # make unique experiment per model and run increasing sequentially
     if "Tuning" in experiment:
         experiment += f" - {model_name}"
-        run_name += ".1"
+        run_name += "1"
 
     # set experiment
     mlflow.set_experiment(experiment)
