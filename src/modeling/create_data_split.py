@@ -23,7 +23,7 @@ def dummy_encoder(
     df : pd.DataFrame
         Dataframe with categorical variables one-hot-encoded(original df if catboost=True).
     """
-    df = pd.get_dummies(df, columns = cols, dtype=int)
+    df = pd.get_dummies(df, columns=cols, dtype=int)
     return df
 
 
