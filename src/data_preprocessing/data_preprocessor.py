@@ -9,7 +9,14 @@ from fuzzywuzzy import fuzz, process
 from scipy.io.arff import loadarff
 from scipy.io.arff._arffread import MetaData
 
-from config.config_data import DICT_H_PATH, DICT_PATH, N_CATEGORIES
+from config.config_data import (
+    DATA_PATH,
+    DICT_H_PATH,
+    DICT_PATH,
+    DROP_COLS,
+    N_CATEGORIES,
+    OUT_PATH,
+)
 
 
 def load_data(path_: Path) -> Tuple[pd.DataFrame, MetaData]:
@@ -405,3 +412,8 @@ def preprocessor(data_path: Path, cols: List[str]) -> pd.DataFrame:
     data = filter_na(data)
 
     return data
+
+
+if __name__ == "__main__":
+    data = preprocessor(DATA_PATH, DROP_COLS)
+    data.to_csv(OUT_PATH, index=False)
