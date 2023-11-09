@@ -53,8 +53,8 @@ def xper_values(
     XPER_values: tuple
         The XPER values for each feature as well as XPER value for each feature and individual
     """
-    XPER = ModelPerformance(X_train, y_train, X_test, y_test, model)
+    XPER = ModelPerformance(X_train, y_train, X_test, y_test, model, sample_size=200)
     PM = XPER.evaluate(["AUC"])
     PM_round = round(PM, 3)
-    XPER_values = XPER.calculate_XPER_values(["AUC"])
+    XPER_values = XPER.calculate_XPER_values(["AUC"], N_coalition_sampled=1000)
     return PM_round, XPER_values
