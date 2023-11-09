@@ -80,9 +80,9 @@ def _get_group_value(n_outcome_group: int, n_outcome: int, n_group: int, n_total
 
 
 def _get_chi2_statistic(
-    predictions: np.ndarray | pd.Series,
+    predictions: np.ndarray or pd.Series,
     positive_outcome: str,
-    attribute_values: np.ndarray | pd.Series,
+    attribute_values: np.ndarray or pd.Series,
     protected_group: str,
 ) -> float:
     """Calculate the chi-squared statistic value.
