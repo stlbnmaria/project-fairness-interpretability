@@ -370,6 +370,7 @@ def preprocess_text(df: pd.DataFrame, column_name: str = "Description") -> pd.Da
 
 def create_n_topics(
     df: pd.DataFrame,
+    columns: list[str],
     column_name: str = "description_clean",
     n_topics: int = 10,
     random_state: int = 42,
@@ -380,6 +381,8 @@ def create_n_topics(
     ----------
     df : pd.DataFrame
         Data to transform.
+    columns_to_transform : list
+        List of column names to be transformed.
     column_name : str, optional
         Name of the column to be transformed. Defaults to "description_clean".
     num_topics : int, optional
@@ -413,6 +416,8 @@ def create_n_topics(
     # Add LDA topic distributions as new features
     for i in range(n_topics):
         df[f"Topic_{i+1}"] = [topic[i][1] if i < len(topic) else 0 for topic in topics]
+
+    df.columns = df.columns[:-n_topics].to_list() + columns
 
     return df
 
@@ -539,7 +544,8 @@ def preprocessor(
     data = preprocess_text(data)
 
     # extracts n new topics from descibe column
-    data = create_n_topics(data, n_topics=n_topics)
+    if feat_cols:
+        data = create_n_topics(data, n_topics=n_topics, columns=feat_cols)
 
     # transforming floats of topics extracted to int
     if t:
