@@ -10,7 +10,7 @@ DROP_COLS = [
     "Commercial.Vehicle",
     "description_clean",
 ]
-OUT_PATH = Path("data") / "data.csv"
+OUT_PATH = Path("data") / "data_plain.csv"
 DICT_PATH = Path("config") / "dict.yaml"
 DICT_H_PATH = Path("config") / "dict_hard.yaml"
 N_CATEGORIES = 15
