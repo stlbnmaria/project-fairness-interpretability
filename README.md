@@ -30,6 +30,7 @@ Check out the jupyter notebooks to understand the data the preprocessing decisio
 
 To run the data preprocessing and get a `data.csv` output for the following parts, run:
 ```bash
+python -m spacy download en_core_web_sm
 python src/data_preprocessing/data_preprocessor.py
 ```
 
@@ -45,9 +46,9 @@ python src/modeling/main.py
 The model selection was performed on the validation data. Below the results are displayed for white and black box models.
 | Model                 | Train AUC | Val AUC  | Test AUC | Test Accuracy | Test F1 Score |
 | --------------------- | --------- | -------- | -------- | ------------- | ------------- |
-| **XGB**               | **0.663** | **0.635**| **0.623**| 0.585         | 0.515         |
-| Random Froest         | 0.644     | 0.632    | 0.621    | **0.587**     | 0.503         |
-| GAM                   | 0.617     | 0.626    | 0.613    | 0.583         | 0.510         |
-| Logistic Regression   | 0.617     | 0.625    | 0.612    | 0.583         | 0.508         |
-| ANN                   | 0.608     | 0.619    | 0.605    | 0.497         | **0.653**     |
-| Decision Tree         | 0.608     | 0.614    | 0.598    | 0.574         | 0.438         |
+| **XGB**               | **0.898** | **0.866**| **0.860**| **0.778**     | **0.748**     |
+| Random Froest         | 0.873     | 0.849    | 0.843    | 0.764         | 0.728         |
+| Decision Tree         | 0.825     | 0.818    | 0.818    | 0.742         | 0.703         |
+| GAM                   | 0.805     | 0.814    | 0.805    | 0.730         | 0.705         |
+| Logistic Regression   | 0.645     | 0.652    | 0.641    | 0.600         | 0.559         |
+| ANN                   | 0.641     | 0.649    | 0.637    | 0.537         | 0.097         |
