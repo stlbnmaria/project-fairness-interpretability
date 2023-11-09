@@ -372,6 +372,7 @@ def create_n_topics(
     df: pd.DataFrame,
     column_name: str = "description_clean",
     n_topics: int = 10,
+    random_state: int = 42,
 ) -> pd.DataFrame:
     """Applies LDA to a text column of DF and adds LDA topic distributions as new features.
 
@@ -383,6 +384,8 @@ def create_n_topics(
         Name of the column to be transformed. Defaults to "description_clean".
     num_topics : int, optional
         Number of topics for LDA. Defaults to 10.
+    random_stat : int
+            Random state of split for reproducibility.
 
     Returns
     -------
@@ -401,7 +404,7 @@ def create_n_topics(
 
     # Train an LDA model
     lda_model = gensim.models.LdaModel(
-        corpus=corpus, id2word=dictionary, num_topics=n_topics, passes=10
+        corpus=corpus, id2word=dictionary, num_topics=n_topics, passes=10, random_state=random_state
     )
 
     # Extract LDA topics
@@ -539,7 +542,8 @@ def preprocessor(
     data = create_n_topics(data, n_topics=n_topics)
 
     # transforming floats of topics extracted to int
-    data = threshold_transform(data, t, feat_cols)
+    if t:
+        data = threshold_transform(data, t, feat_cols)
 
     # drop unwished cols
     data = drop_cols(data, cols)
