@@ -16,4 +16,4 @@ DICT_H_PATH = Path("config") / "dict_hard.yaml"
 N_CATEGORIES = 15
 N_TOPICS = 3
 THRESHOLD = 0.334
-NLP_FEATURE_COLS = ["Topic_1", "Topic_2", "Topic_3"]
+NLP_FEATURE_COLS = ["Obey.Police.Veh.Doc", "Fail.Obey.Signals", "Speed.Veh.Light"]
