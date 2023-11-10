@@ -35,7 +35,7 @@ python src/data_preprocessing/data_preprocessor.py
 ```
 
 ## Modeling
-The paramters can be changed in the `config/config_modeling.py`. The data is seperated into 60% training and 20% validation and testing each by default.
+The parameters can be changed in the `config/config_modeling.py`. The data is seperated into 60% training and 20% validation and testing each by default.
 
 Run the training with mlflow tracking with the following command:
 ```bash
@@ -52,3 +52,6 @@ The model selection was performed on the validation data. Below the results are 
 | GAM                   | 0.805     | 0.814    | 0.805    | 0.730         | 0.705         |
 | Logistic Regression   | 0.645     | 0.652    | 0.641    | 0.600         | 0.559         |
 | ANN                   | 0.641     | 0.649    | 0.637    | 0.537         | 0.097         |
+
+##  Explainability and fairness
+If you are interested in our conclusions regarding how our model works and if it is fair to different protected attributes, please check  within the notebooks folder the explanation and fairness subfolders, respectively. 
